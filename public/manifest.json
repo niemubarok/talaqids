@@ -1,0 +1,36 @@
+{
+  "name": "talaQids — Pendamping Hafiz Al-Qur'an Sejak Dini",
+  "short_name": "talaQids",
+  "description": "PWA pendamping orang tua mencetak anak hafiz Al-Qur'an sejak dini dengan metode siklus 30 Juz (Ustaz Adi Hidayat).",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F6F0E4",
+  "theme_color": "#1E4C40",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

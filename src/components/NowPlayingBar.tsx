@@ -1,0 +1,152 @@
+'use client';
+
+import React, { useRef, useState } from 'react';
+import Image from 'next/image';
+import { ChevronUp, Loader2, Pause, Play, SkipForward } from 'lucide-react';
+import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+
+interface NowPlayingBarProps {
+  isPro?: boolean;
+  onExpand: () => void;
+}
+
+export function NowPlayingBar({ isPro = false, onExpand }: NowPlayingBarProps) {
+  const { state, togglePlay, nextTrack } = useAudioPlayer();
+  const track = state.tracks[state.currentTrackIndex];
+
+  const [dragY, setDragY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const startY = useRef<number | null>(null);
+  const moved = useRef(false);
+
+  const progress =
+    state.duration > 0 ? Math.min(100, (state.currentTime / state.duration) * 100) : 0;
+
+  const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    startY.current = event.clientY;
+    moved.current = false;
+    setIsDragging(true);
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+  };
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (startY.current === null) return;
+    const delta = event.clientY - startY.current;
+    if (Math.abs(delta) > 8) moved.current = true;
+    setDragY(Math.max(-56, Math.min(0, delta)));
+  };
+
+  const finishGesture = () => {
+    if (dragY <= -40) {
+      onExpand();
+    }
+    startY.current = null;
+    setDragY(0);
+    setIsDragging(false);
+  };
+
+  const handleActivate = () => {
+    if (moved.current) return;
+    onExpand();
+  };
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      aria-label="Buka pemutar ayat"
+      onClick={handleActivate}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onExpand();
+        }
+      }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={finishGesture}
+      onPointerCancel={finishGesture}
+      style={{
+        transform: `translateY(${dragY}px)`,
+        transition: isDragging ? 'none' : 'transform 240ms cubic-bezier(.22,.61,.36,1)',
+      }}
+      className="pointer-events-auto relative touch-none select-none overflow-hidden rounded-[24px] border border-[#1E4C40]/10 bg-[#FFFCF5]/95 shadow-[0_28px_60px_-32px_rgba(16,46,39,0.65)] backdrop-blur-xl outline-none focus-visible:ring-2 focus-visible:ring-[#C89B4E]"
+    >
+      {/* playback progress hairline */}
+      <div className="absolute inset-x-0 top-0 h-[3px] bg-[#1E4C40]/10">
+        <div
+          className="h-full rounded-r-full bg-gradient-to-r from-[#C89B4E] to-[#E4C486] transition-[width] duration-300"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+
+      <div className="flex items-center gap-3 px-3 pb-2.5 pt-3">
+        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl bg-[#F3E9D5] p-1.5 ring-1 ring-[#1E4C40]/10">
+          <Image
+            src="/icons/icon-192.png"
+            alt=""
+            width={192}
+            height={192}
+            className="h-full w-full object-contain"
+          />
+          {state.isPlaying && (
+            <span className="absolute bottom-0 right-0 flex h-4 w-4 items-end justify-center gap-[2px] rounded-full bg-[#1E4C40] px-[3px] pb-[3px]">
+              <span className="eq-bar h-1.5 w-[2px] rounded-full bg-[#EAD8AF]" />
+              <span className="eq-bar h-2 w-[2px] rounded-full bg-[#EAD8AF] [animation-delay:120ms]" />
+              <span className="eq-bar h-1 w-[2px] rounded-full bg-[#EAD8AF] [animation-delay:240ms]" />
+            </span>
+          )}
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1.5">
+            <p className="truncate text-[13.5px] font-extrabold leading-tight tracking-tight text-[#15231E]">
+              {track ? `QS. ${track.surahName} · ${track.ayahNumber}` : 'Menyiapkan murottal...'}
+            </p>
+            {!isPro && (
+              <span className="shrink-0 rounded-full bg-[#C89B4E]/15 px-1.5 py-0.5 text-[8.5px] font-extrabold uppercase tracking-wider text-[#9C7330]">
+                Streaming Online
+              </span>
+            )}
+          </div>
+          <p className="mt-0.5 truncate text-[11px] font-medium text-[#6B7A72]">
+            Juz {state.activeJuz} • Halaman {track?.mushafPage ?? 1} •{' '}
+            {state.isPlaying ? 'Sedang diputar' : 'Siap diputar'}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            void togglePlay();
+          }}
+          aria-label={state.isPlaying ? 'Jeda' : 'Putar'}
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1E4C40] text-[#F7EFD9] shadow-[0_8px_20px_-8px_rgba(16,46,39,0.8)] transition active:scale-95"
+        >
+          {state.isLoading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : state.isPlaying ? (
+            <Pause className="h-4 w-4 fill-current" />
+          ) : (
+            <Play className="h-4 w-4 translate-x-[1px] fill-current" />
+          )}
+        </button>
+
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            void nextTrack();
+          }}
+          aria-label="Ayat berikutnya"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#5C6B63] transition hover:bg-[#1E4C40]/8"
+        >
+          <SkipForward className="h-[18px] w-[18px] fill-current" />
+        </button>
+
+        <ChevronUp className="h-4 w-4 shrink-0 text-[#9AA79F]" aria-hidden />
+      </div>
+    </div>
+  );
+}

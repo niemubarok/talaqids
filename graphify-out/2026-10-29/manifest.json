@@ -1,0 +1,212 @@
+{
+  "next.config.ts": {
+    "mtime": 1793242033.1576235,
+    "seen": 1793259222.580205,
+    "ast_hash": "fb1fa665688f04242b8d0f74fc62fae1",
+    "semantic_hash": "fb1fa665688f04242b8d0f74fc62fae1"
+  },
+  "package.json": {
+    "mtime": 1793242024.5897982,
+    "seen": 1793259222.580205,
+    "ast_hash": "e2fa15be39db19da93a824bbd157f881",
+    "semantic_hash": "e2fa15be39db19da93a824bbd157f881"
+  },
+  "postcss.config.mjs": {
+    "mtime": 1793242045.0429235,
+    "seen": 1793259222.580205,
+    "ast_hash": "481fac0fdecd70e1821cc30b86030c1a",
+    "semantic_hash": "481fac0fdecd70e1821cc30b86030c1a"
+  },
+  "public/manifest.json": {
+    "mtime": 1793242651.827175,
+    "seen": 1793259222.580205,
+    "ast_hash": "4cac5886a4fa0ac04af69f754ecce54f",
+    "semantic_hash": "4cac5886a4fa0ac04af69f754ecce54f"
+  },
+  "public/sw.js": {
+    "mtime": 1793242656.0655186,
+    "seen": 1793259222.580205,
+    "ast_hash": "3f12f99776e004e234ad5697944b7ae5",
+    "semantic_hash": "3f12f99776e004e234ad5697944b7ae5"
+  },
+  "skills-lock.json": {
+    "mtime": 1793237489.7256236,
+    "seen": 1793259222.580205,
+    "ast_hash": "b59f8264bb668befe258c8a710e19196",
+    "semantic_hash": "b59f8264bb668befe258c8a710e19196"
+  },
+  "src/app/layout.tsx": {
+    "mtime": 1793243317.5574968,
+    "seen": 1793259222.580205,
+    "ast_hash": "56e3a456ca8e3e6e2ee42ef8424822b3",
+    "semantic_hash": "56e3a456ca8e3e6e2ee42ef8424822b3"
+  },
+  "src/app/page.tsx": {
+    "mtime": 1793244053.306525,
+    "seen": 1793259222.580205,
+    "ast_hash": "6f9679a916df97f45b18b95d582d7699",
+    "semantic_hash": "6f9679a916df97f45b18b95d582d7699"
+  },
+  "src/components/DashboardAudioView.tsx": {
+    "mtime": 1793256808.936278,
+    "seen": 1793259222.580205,
+    "ast_hash": "2ada6b00afa76e340b923a0a5c777c02",
+    "semantic_hash": "2ada6b00afa76e340b923a0a5c777c02"
+  },
+  "src/components/InfaqSettingsView.tsx": {
+    "mtime": 1793257276.0923722,
+    "seen": 1793259222.580205,
+    "ast_hash": "2a2a5b4d9ef9188b7df7c488d00f5d07",
+    "semantic_hash": "2a2a5b4d9ef9188b7df7c488d00f5d07"
+  },
+  "src/components/MushafManualView.tsx": {
+    "mtime": 1793256944.453845,
+    "seen": 1793259222.580205,
+    "ast_hash": "fb4c2591249bd3bdd554968388982e5a",
+    "semantic_hash": "fb4c2591249bd3bdd554968388982e5a"
+  },
+  "src/components/OnboardingModal.tsx": {
+    "mtime": 1793243319.5714705,
+    "seen": 1793259222.580205,
+    "ast_hash": "6f5829b8999d59b2bec9139e6f6f18de",
+    "semantic_hash": "6f5829b8999d59b2bec9139e6f6f18de"
+  },
+  "src/hooks/useAudioPlayer.ts": {
+    "mtime": 1793256764.3207622,
+    "seen": 1793259222.580205,
+    "ast_hash": "cdb2fb08066a5a1978b2b8f41287eaff",
+    "semantic_hash": "cdb2fb08066a5a1978b2b8f41287eaff"
+  },
+  "src/lib/cycle-math.ts": {
+    "mtime": 1793242960.0808308,
+    "seen": 1793259222.580205,
+    "ast_hash": "4e66811d0cd631c39a0896f295344e31",
+    "semantic_hash": "4e66811d0cd631c39a0896f295344e31"
+  },
+  "src/lib/db.ts": {
+    "mtime": 1793256512.3780985,
+    "seen": 1793259222.580205,
+    "ast_hash": "67fde79e63f891b3ac645fc7e6e709c2",
+    "semantic_hash": "67fde79e63f891b3ac645fc7e6e709c2"
+  },
+  "src/lib/quran-api.ts": {
+    "mtime": 1793242964.3796935,
+    "seen": 1793259222.580205,
+    "ast_hash": "2d89f76ee83c7440d11cc546f538d3b2",
+    "semantic_hash": "2d89f76ee83c7440d11cc546f538d3b2"
+  },
+  "src/lib/quran-metadata.ts": {
+    "mtime": 1793256509.501616,
+    "seen": 1793259222.580205,
+    "ast_hash": "0efabb4ba1a21aa67438636f6b877b77",
+    "semantic_hash": "0efabb4ba1a21aa67438636f6b877b77"
+  },
+  "tsconfig.json": {
+    "mtime": 1793242029.8486512,
+    "seen": 1793259222.580205,
+    "ast_hash": "6abdc928f431c839cc04d9e13060b036",
+    "semantic_hash": "6abdc928f431c839cc04d9e13060b036"
+  },
+  ".agent/skills/audio-engine.md": {
+    "mtime": 1793237523.662056,
+    "seen": 1793259222.580205,
+    "ast_hash": "62f56627ad116b35df78679d6989bb1f",
+    "semantic_hash": "62f56627ad116b35df78679d6989bb1f"
+  },
+  ".agent/skills/cycle-math.md": {
+    "mtime": 1793237523.66051,
+    "seen": 1793259222.580205,
+    "ast_hash": "cf2540e8cee60e271f5860fc65fd37dd",
+    "semantic_hash": "cf2540e8cee60e271f5860fc65fd37dd"
+  },
+  ".agent/skills/db-schema.md": {
+    "mtime": 1793242027.4028506,
+    "seen": 1793259222.580205,
+    "ast_hash": "044ffe923b6785860bde465d600a9e55",
+    "semantic_hash": "044ffe923b6785860bde465d600a9e55"
+  },
+  ".agents/skills/mobile-app-ui-design/INDEX.md": {
+    "mtime": 1793237417.1593857,
+    "seen": 1793259222.580205,
+    "ast_hash": "fca96b82ef89775353578658b488e162",
+    "semantic_hash": "fca96b82ef89775353578658b488e162"
+  },
+  ".agents/skills/mobile-app-ui-design/README.md": {
+    "mtime": 1793237417.1623926,
+    "seen": 1793259222.580205,
+    "ast_hash": "6ef41a1b84873c5d24bb374cffe82244",
+    "semantic_hash": "6ef41a1b84873c5d24bb374cffe82244"
+  },
+  ".agents/skills/mobile-app-ui-design/SKILL.md": {
+    "mtime": 1793237417.1664224,
+    "seen": 1793259222.580205,
+    "ast_hash": "7353d6fc541efac41aa7af659c8512c9",
+    "semantic_hash": "7353d6fc541efac41aa7af659c8512c9"
+  },
+  ".agents/skills/mobile-app-ui-design/references/industry-conventions.md": {
+    "mtime": 1793237417.1694312,
+    "seen": 1793259222.580205,
+    "ast_hash": "77344e697dab9314519450472c1d2855",
+    "semantic_hash": "77344e697dab9314519450472c1d2855"
+  },
+  ".github/copilot-instructions.md": {
+    "mtime": 1793237523.654986,
+    "seen": 1793259222.580205,
+    "ast_hash": "05f562d1b296c03c54ee43214091b6ca",
+    "semantic_hash": "05f562d1b296c03c54ee43214091b6ca"
+  },
+  ".kiro/skills/mobile-app-ui-design/INDEX.md": {
+    "mtime": 1793237417.1593857,
+    "seen": 1793259222.580205,
+    "ast_hash": "fca96b82ef89775353578658b488e162",
+    "semantic_hash": "fca96b82ef89775353578658b488e162"
+  },
+  ".kiro/skills/mobile-app-ui-design/README.md": {
+    "mtime": 1793237417.1623926,
+    "seen": 1793259222.580205,
+    "ast_hash": "6ef41a1b84873c5d24bb374cffe82244",
+    "semantic_hash": "6ef41a1b84873c5d24bb374cffe82244"
+  },
+  ".kiro/skills/mobile-app-ui-design/SKILL.md": {
+    "mtime": 1793237417.1664224,
+    "seen": 1793259222.580205,
+    "ast_hash": "7353d6fc541efac41aa7af659c8512c9",
+    "semantic_hash": "7353d6fc541efac41aa7af659c8512c9"
+  },
+  ".kiro/skills/mobile-app-ui-design/references/industry-conventions.md": {
+    "mtime": 1793237417.1694312,
+    "seen": 1793259222.580205,
+    "ast_hash": "77344e697dab9314519450472c1d2855",
+    "semantic_hash": "77344e697dab9314519450472c1d2855"
+  },
+  "PRD.md": {
+    "mtime": 1793240335.407922,
+    "seen": 1793259222.580205,
+    "ast_hash": "2105b167dea0cd88b3e5493b6299b42c",
+    "semantic_hash": "2105b167dea0cd88b3e5493b6299b42c"
+  },
+  "README.md": {
+    "mtime": 1793255989.5141065,
+    "seen": 1793259222.580205,
+    "ast_hash": "ab6e46c8eb62407a67ea811c69ee6bcc",
+    "semantic_hash": "ab6e46c8eb62407a67ea811c69ee6bcc"
+  },
+  "public/icon.svg": {
+    "mtime": 1793242653.8784077,
+    "seen": 1793259222.580205,
+    "ast_hash": "39ccd9645bd3baab234de7e72c0f95a6",
+    "semantic_hash": "39ccd9645bd3baab234de7e72c0f95a6"
+  },
+  "public/icon_talaqids.png": {
+    "mtime": 1793257700.8574252,
+    "seen": 1793259222.580205,
+    "ast_hash": "e7271be5222bfa677b7ae66fc9fa24b8",
+    "semantic_hash": "e7271be5222bfa677b7ae66fc9fa24b8"
+  },
+  "public/logo_talaqids.png": {
+    "mtime": 1793257698.4156194,
+    "seen": 1793259222.580205,
+    "ast_hash": "4f88af928e9cce66c6304dc811da7e3a",
+    "semantic_hash": "4f88af928e9cce66c6304dc811da7e3a"
+  }
+}
