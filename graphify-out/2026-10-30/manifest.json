@@ -6,10 +6,10 @@
     "semantic_hash": "fb1fa665688f04242b8d0f74fc62fae1"
   },
   "package.json": {
-    "mtime": 1793242024.5897982,
-    "seen": 1793259222.580205,
-    "ast_hash": "e2fa15be39db19da93a824bbd157f881",
-    "semantic_hash": "e2fa15be39db19da93a824bbd157f881"
+    "mtime": 1793329823.9290614,
+    "seen": 1793330698.546645,
+    "ast_hash": "39e6a1446f7a914bd87275657cbb66a0",
+    "semantic_hash": ""
   },
   "postcss.config.mjs": {
     "mtime": 1793242045.0429235,
@@ -24,9 +24,9 @@
     "semantic_hash": ""
   },
   "public/sw.js": {
-    "mtime": 1793261255.9120274,
-    "seen": 1793261496.8086712,
-    "ast_hash": "21198c794d0a8aed0d635644d98dbbbb",
+    "mtime": 1793329022.2318685,
+    "seen": 1793330698.546645,
+    "ast_hash": "3a7b27139c1f57eca1f57e04d372ecf4",
     "semantic_hash": ""
   },
   "skills-lock.json": {
@@ -36,45 +36,45 @@
     "semantic_hash": "b59f8264bb668befe258c8a710e19196"
   },
   "src/app/layout.tsx": {
-    "mtime": 1793260699.8925393,
-    "seen": 1793261496.8086712,
-    "ast_hash": "18a8382a8ce46b27503b43235e8400ac",
+    "mtime": 1793330545.0059917,
+    "seen": 1793330698.546645,
+    "ast_hash": "7a01b0d6cf92ff3734f3184bd3a5784c",
     "semantic_hash": ""
   },
   "src/app/page.tsx": {
-    "mtime": 1793261043.5320282,
-    "seen": 1793261496.8086712,
-    "ast_hash": "01235a72426075666b84fcf0a644e6ba",
+    "mtime": 1793329022.224285,
+    "seen": 1793330698.546645,
+    "ast_hash": "affc207297c69e81a75886e22a720710",
     "semantic_hash": ""
   },
   "src/components/DashboardAudioView.tsx": {
-    "mtime": 1793260529.4922872,
-    "seen": 1793261496.8086712,
-    "ast_hash": "9d769d9e2db4f74ab108b8eed8dd4cec",
+    "mtime": 1793317014.2974243,
+    "seen": 1793330698.546645,
+    "ast_hash": "1a7ac25acc4f59dd14207a99f6043301",
     "semantic_hash": ""
   },
   "src/components/InfaqSettingsView.tsx": {
-    "mtime": 1793260649.9300063,
-    "seen": 1793261496.8086712,
-    "ast_hash": "d2d08cd1cd84b1166e239e073e97ef61",
+    "mtime": 1793330622.5063608,
+    "seen": 1793330698.546645,
+    "ast_hash": "43b098e49fddd828977c3de8b28ed2c1",
     "semantic_hash": ""
   },
   "src/components/MushafManualView.tsx": {
-    "mtime": 1793260614.3936205,
-    "seen": 1793261496.8086712,
-    "ast_hash": "bb27e27e07baf6ce64c7fa0517f5c3c5",
+    "mtime": 1793317014.2839453,
+    "seen": 1793330698.546645,
+    "ast_hash": "5e3ddee287680e1c0792e444dd130777",
     "semantic_hash": ""
   },
   "src/components/OnboardingModal.tsx": {
-    "mtime": 1793260678.8957615,
-    "seen": 1793261496.8086712,
-    "ast_hash": "57224d452f20bf45894dec7fae4e12b2",
+    "mtime": 1793316183.3083498,
+    "seen": 1793330698.546645,
+    "ast_hash": "07eeade3d86860be30ac3548a1e27aa3",
     "semantic_hash": ""
   },
   "src/hooks/useAudioPlayer.ts": {
-    "mtime": 1793261024.9582977,
-    "seen": 1793261496.8086712,
-    "ast_hash": "739f4d9c46b6f600c2cf8b1af12a90ab",
+    "mtime": 1793316830.1176276,
+    "seen": 1793330698.546645,
+    "ast_hash": "b64d79c749ab915882d956fc68ed9f2b",
     "semantic_hash": ""
   },
   "src/lib/cycle-math.ts": {
@@ -84,22 +84,22 @@
     "semantic_hash": "4e66811d0cd631c39a0896f295344e31"
   },
   "src/lib/db.ts": {
-    "mtime": 1793256512.3780985,
-    "seen": 1793259222.580205,
-    "ast_hash": "67fde79e63f891b3ac645fc7e6e709c2",
-    "semantic_hash": "67fde79e63f891b3ac645fc7e6e709c2"
+    "mtime": 1793317014.2839453,
+    "seen": 1793330698.546645,
+    "ast_hash": "e2dc601cdc727ac888e62b55600fbd96",
+    "semantic_hash": ""
   },
   "src/lib/quran-api.ts": {
-    "mtime": 1793242964.3796935,
-    "seen": 1793259222.580205,
-    "ast_hash": "2d89f76ee83c7440d11cc546f538d3b2",
-    "semantic_hash": "2d89f76ee83c7440d11cc546f538d3b2"
+    "mtime": 1793264240.2865562,
+    "seen": 1793330698.546645,
+    "ast_hash": "ab3eda3177d4a670bf8a416ceb7bacf7",
+    "semantic_hash": ""
   },
   "src/lib/quran-metadata.ts": {
-    "mtime": 1793256509.501616,
-    "seen": 1793259222.580205,
-    "ast_hash": "0efabb4ba1a21aa67438636f6b877b77",
-    "semantic_hash": "0efabb4ba1a21aa67438636f6b877b77"
+    "mtime": 1793330072.9150975,
+    "seen": 1793330698.546645,
+    "ast_hash": "cd2768117b676064d7cb2275f0ad0028",
+    "semantic_hash": ""
   },
   "tsconfig.json": {
     "mtime": 1793242029.8486512,
@@ -180,21 +180,21 @@
     "semantic_hash": "4f88af928e9cce66c6304dc811da7e3a"
   },
   "src/components/NowPlayingBar.tsx": {
-    "mtime": 1793260432.6348002,
-    "seen": 1793261496.8086712,
-    "ast_hash": "7f6c604cdca360701f223bafd3247185",
+    "mtime": 1793329023.751166,
+    "seen": 1793330698.546645,
+    "ast_hash": "d975590deaed4011e0bc6f9acd7c4cb9",
     "semantic_hash": ""
   },
   "src/components/NowPlayingSheet.tsx": {
-    "mtime": 1793260491.3188932,
-    "seen": 1793261496.8086712,
-    "ast_hash": "a62d2b651849af8a580758633fe9da22",
+    "mtime": 1793268828.1891227,
+    "seen": 1793330698.546645,
+    "ast_hash": "1a02db0c3f7780caeb90502134d152b5",
     "semantic_hash": ""
   },
   "src/hooks/useAyahText.ts": {
-    "mtime": 1793260407.9461217,
-    "seen": 1793261496.8086712,
-    "ast_hash": "58fefcca0dc3fd73e5bf9e3e550f1a55",
+    "mtime": 1793264240.301109,
+    "seen": 1793330698.546645,
+    "ast_hash": "0057e9b4918d9fb6d01af2fc3a32d5a3",
     "semantic_hash": ""
   },
   "public/icons/apple-touch-icon.png": {
@@ -237,6 +237,60 @@
     "mtime": 1793259295.4036071,
     "seen": 1793261496.8086712,
     "ast_hash": "bf77193e9431c39c29c0dfea1a96054c",
+    "semantic_hash": ""
+  },
+  "src/app/not-found.tsx": {
+    "mtime": 1793330545.0059917,
+    "seen": 1793330698.546645,
+    "ast_hash": "5e2cfb9d23fb04f3776eba55274557d5",
+    "semantic_hash": ""
+  },
+  "src/components/InsightsView.tsx": {
+    "mtime": 1793262806.6255534,
+    "seen": 1793330698.546645,
+    "ast_hash": "f490c85670d596dd586a86418c87f1e3",
+    "semantic_hash": ""
+  },
+  "src/components/PwaInstallBanner.tsx": {
+    "mtime": 1793315444.8940926,
+    "seen": 1793330698.546645,
+    "ast_hash": "05da0c9b916359cf26ab6125f139d84d",
+    "semantic_hash": ""
+  },
+  "src/components/ReciterProfileModal.tsx": {
+    "mtime": 1793330116.6442945,
+    "seen": 1793330698.546645,
+    "ast_hash": "033cbca26fe16d16b3f8bb8587a00e9c",
+    "semantic_hash": ""
+  },
+  "src/lib/google-drive-sync.ts": {
+    "mtime": 1793329022.1813703,
+    "seen": 1793330698.546645,
+    "ast_hash": "17fcf01a9d6181fe8e21fbcb93b70b17",
+    "semantic_hash": ""
+  },
+  "public/images/reciters/abdul_basit.jpg": {
+    "mtime": 1793329632.9839878,
+    "seen": 1793330698.546645,
+    "ast_hash": "85d7c0b6249aeee25566b97096527e75",
+    "semantic_hash": ""
+  },
+  "public/images/reciters/al_husary.jpg": {
+    "mtime": 1793329630.7115207,
+    "seen": 1793330698.546645,
+    "ast_hash": "514476d305ad2103c4d270dbeadce3e8",
+    "semantic_hash": ""
+  },
+  "public/images/reciters/al_minshawi.jpg": {
+    "mtime": 1793329629.2224085,
+    "seen": 1793330698.546645,
+    "ast_hash": "3b7191b03fe09c237af25ae04703e99c",
+    "semantic_hash": ""
+  },
+  "public/images/reciters/alafasy.jpg": {
+    "mtime": 1793329631.1605313,
+    "seen": 1793330698.546645,
+    "ast_hash": "59661392ada19f1c82cf17d8373e62db",
     "semantic_hash": ""
   }
 }

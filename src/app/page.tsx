@@ -418,12 +418,12 @@ export default function HomePage() {
           }`}
           aria-hidden={isPlayerOpen}
         >
-          <div className="pointer-events-auto overflow-hidden rounded-[26px] border border-[#1E4C40]/12 bg-[#FFFCF5]/95 shadow-[0_24px_50px_-20px_rgba(16,46,39,0.5)] backdrop-blur-xl">
+          <div className="pointer-events-auto overflow-hidden rounded-[22px] border border-white/85 bg-gradient-to-b from-[#FFFCF5]/80 via-[#FFFCF5]/60 to-[#F6F0E4]/15 shadow-[0_20px_45px_-18px_rgba(16,46,39,0.35),inset_0_1.5px_1px_rgba(255,255,255,0.95)] backdrop-blur-2xl backdrop-saturate-150">
             <NowPlayingBar isPro={settings.isProUser} onExpand={() => setIsPlayerOpen(true)} />
 
             <nav
               aria-label="Navigasi utama"
-              className="border-t border-[#1E4C40]/8 p-1"
+              className="border-t border-[#1E4C40]/6 px-1.5 py-1"
             >
               <div className="grid grid-cols-3 gap-1">
                 {NAV_ITEMS.map((item) => {
@@ -435,14 +435,14 @@ export default function HomePage() {
                       type="button"
                       onClick={() => setActiveTab(item.id)}
                       aria-current={isActive ? 'page' : undefined}
-                      className={`flex min-h-[46px] flex-col items-center justify-center gap-0.5 rounded-[18px] transition ${
+                      className={`flex h-[34px] items-center justify-center gap-1.5 rounded-full transition-all duration-200 active:scale-95 ${
                         isActive
-                          ? 'bg-[#1E4C40] text-[#F3E7CB] shadow-[0_10px_20px_-10px_rgba(16,46,39,0.8)]'
-                          : 'text-[#6B7A72] hover:bg-[#1E4C40]/5'
+                          ? 'bg-[#1E4C40] text-[#F3E7CB] shadow-[0_4px_12px_-4px_rgba(16,46,39,0.6)] font-bold'
+                          : 'text-[#6B7A72] hover:text-[#1E4C40] hover:bg-[#1E4C40]/5 font-medium'
                       }`}
                     >
-                      <Icon className="h-4 w-4" />
-                      <span className="text-[9.5px] font-bold tracking-wide">{item.label}</span>
+                      <Icon className="h-3.5 w-3.5 shrink-0" />
+                      <span className="text-[10px] tracking-tight">{item.label}</span>
                     </button>
                   );
                 })}

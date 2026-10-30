@@ -284,95 +284,100 @@ export function DashboardAudioView({
       {/* ── Detail Fokus Juz Aktif ──────────────────────────────────── */}
       <section className="surface rise p-4 [animation-delay:110ms]">
         <div className="flex items-start justify-between gap-3">
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="text-[9.5px] font-extrabold uppercase tracking-[0.2em] text-[#C89B4E]">
               Fokus Kurikulum Bulan Ini
             </p>
-            <h2 className="mt-0.5 text-base font-extrabold text-[#15231E]">
-              Juz {cycle.currentJuz} · {juzMeta.nameTransliteration}
-            </h2>
+            <div className="mt-0.5 flex flex-wrap items-baseline gap-2">
+              <h2 className="text-base font-extrabold text-[#15231E]">
+                Juz {cycle.currentJuz} · {juzMeta.nameTransliteration}
+              </h2>
+              <span
+                dir="rtl"
+                className="rounded-lg bg-[#F6F0E4] px-2 py-0.5 font-arabic text-xs leading-none text-[#1E4C40]"
+              >
+                {juzMeta.nameArabic}
+              </span>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => void togglePlay()}
-              className="flex items-center gap-1.5 rounded-full bg-[#1E4C40] px-3 py-1.5 text-xs font-bold text-[#F7EFD9] shadow-[0_8px_18px_-6px_rgba(16,46,39,0.7)] transition hover:bg-[#275E50] active:scale-95"
-              aria-label={state.isPlaying ? 'Jeda Murottal' : 'Putar Murottal'}
-            >
-              {state.isPlaying ? (
-                <>
-                  <Pause className="h-3.5 w-3.5 fill-current" />
-                  <span>Jeda</span>
-                </>
-              ) : (
-                <>
-                  <Play className="h-3.5 w-3.5 translate-x-[0.5px] fill-current" />
-                  <span>Putar</span>
-                </>
-              )}
-            </button>
-            <span
-              dir="rtl"
-              className="rounded-xl bg-[#F6F0E4] px-2.5 py-1 font-arabic text-base text-[#1E4C40]"
-            >
-              {juzMeta.nameArabic}
-            </span>
-          </div>
+          <button
+            type="button"
+            onClick={() => void togglePlay()}
+            className="flex shrink-0 items-center gap-1.5 rounded-full bg-[#1E4C40] px-3.5 py-1.5 text-xs font-bold text-[#F7EFD9] shadow-[0_8px_18px_-6px_rgba(16,46,39,0.7)] transition hover:bg-[#275E50] active:scale-95"
+            aria-label={state.isPlaying ? 'Jeda Murottal' : 'Putar Murottal'}
+          >
+            {state.isPlaying ? (
+              <>
+                <Pause className="h-3.5 w-3.5 fill-current" />
+                <span>Jeda</span>
+              </>
+            ) : (
+              <>
+                <Play className="h-3.5 w-3.5 translate-x-[0.5px] fill-current" />
+                <span>Putar</span>
+              </>
+            )}
+          </button>
         </div>
 
-        <div className="mt-3 grid grid-cols-3 gap-2">
-          <div className="surface-soft px-3 py-2">
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <div className="surface-soft min-w-0 p-3">
             <p className="text-[9px] font-bold uppercase tracking-wider text-[#8A968F]">
               Cakupan Surah
             </p>
-            <p className="mt-0.5 truncate text-[11px] font-extrabold text-[#15231E]">
+            <p className="mt-0.5 truncate text-[11px] font-extrabold text-[#15231E]" title={`${startSurah?.name} – ${endSurah?.name}`}>
               {startSurah?.name} – {endSurah?.name}
             </p>
-            <p className="text-[9.5px] text-[#6B7A72]">
+            <p className="mt-0.5 text-[9.5px] text-[#6B7A72]">
               {juzMeta.surahList.length} surah · {state.tracks.length} ayat
             </p>
           </div>
 
-          <div className="surface-soft px-3 py-2">
+          <div className="surface-soft min-w-0 p-3">
             <p className="text-[9px] font-bold uppercase tracking-wider text-[#8A968F]">
               Mushaf Madinah
             </p>
             <p className="mt-0.5 text-[11px] font-extrabold text-[#15231E]">
               Hal. {juzMeta.startPage}–{juzMeta.endPage}
             </p>
-            <p className="text-[9.5px] text-[#6B7A72]">20 halaman standar</p>
+            <p className="mt-0.5 text-[9.5px] text-[#6B7A72]">20 halaman standar</p>
           </div>
 
           <button
             type="button"
             onClick={() => setShowReciterProfile(true)}
-            className="surface-soft flex items-center gap-2.5 px-3 py-2 text-left transition hover:bg-[#1E4C40]/5 active:scale-98"
+            className="surface-soft col-span-2 flex items-center justify-between gap-3 p-2.5 text-left transition hover:bg-[#1E4C40]/5 active:scale-[0.99]"
           >
-            <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-xl border border-[#1E4C40]/15 bg-[#15352C] shadow-2xs">
-              <Image
-                src={reciter.photoUrl}
-                alt={reciter.name}
-                fill
-                sizes="36px"
-                className="object-cover object-top"
-              />
+            <div className="flex min-w-0 items-center gap-2.5">
+              <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-xl border border-[#1E4C40]/15 bg-[#15352C] shadow-2xs">
+                <Image
+                  src={reciter.photoUrl}
+                  alt={reciter.name}
+                  fill
+                  sizes="36px"
+                  className="object-cover object-top"
+                />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[9px] font-bold uppercase tracking-wider text-[#8A968F]">
+                  Qari Murottal
+                </p>
+                <p className="truncate text-xs font-extrabold text-[#15231E]">
+                  {reciter.name}
+                </p>
+                <p className="truncate text-[9.5px] text-[#6B7A72]">
+                  {reciter.style}
+                </p>
+              </div>
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-[9px] font-bold uppercase tracking-wider text-[#8A968F]">
-                Qari Murottal
-              </p>
-              <p className="truncate text-[11px] font-extrabold text-[#15231E]">
-                {reciter.shortName}
-              </p>
-              <p className="truncate text-[9.5px] font-semibold text-[#2F6B5B]">
-                Lihat profil &gt;
-              </p>
-            </div>
+            <span className="flex shrink-0 items-center gap-1 rounded-full bg-[#1E4C40]/8 px-2.5 py-1 text-[9.5px] font-bold text-[#1E4C40]">
+              Profil <ArrowRight className="h-3 w-3" />
+            </span>
           </button>
         </div>
 
-        <div className="mt-3 flex items-center justify-between border-t border-[#1E4C40]/8 pt-2.5">
-          <span className="text-[10px] font-medium text-[#6B7A72]">
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-[#1E4C40]/8 pt-2.5">
+          <span className="min-w-0 text-[10px] font-medium text-[#6B7A72]">
             {isPro
               ? `Offline tersimpan: ${state.offlineCachedCount}/${state.tracks.length} ayat`
               : 'Mode pemutaran: Streaming Online'}
@@ -380,7 +385,7 @@ export function DashboardAudioView({
           <button
             type="button"
             onClick={() => void restartFromBeginning()}
-            className="inline-flex items-center gap-1 rounded-full bg-[#1E4C40]/8 px-2.5 py-1 text-[10px] font-extrabold text-[#1E4C40] transition hover:bg-[#1E4C40]/14 active:scale-95"
+            className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#1E4C40]/8 px-2.5 py-1 text-[10px] font-extrabold text-[#1E4C40] transition hover:bg-[#1E4C40]/14 active:scale-95"
           >
             <Repeat className="h-3 w-3" />
             Ulang Juz dari Ayat 1
@@ -464,7 +469,7 @@ export function DashboardAudioView({
           })}
         </div>
 
-        <div className="mt-2.5 flex items-center justify-between text-[9.5px] font-semibold text-[#8A968F]">
+        <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 text-[9.5px] font-semibold text-[#8A968F]">
           <span className="flex items-center gap-1">
             <span className="h-2 w-2 rounded-sm bg-[#1E4C40]" /> Selesai ({Math.max(0, cycle.currentMonth - 1)} Juz)
           </span>

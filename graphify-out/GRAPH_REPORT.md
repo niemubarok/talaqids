@@ -1,25 +1,25 @@
 # Graph Report - talaqids  (2026-10-30)
 
 ## Corpus Check
-- 36 files · ~131,618 words
+- 37 files · ~133,259 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 5 file(s) not represented in the graph (top: (none) 2, .lock 1, .ico 1)
 
 ## Summary
-- 347 nodes · 721 edges · 17 communities (14 shown, 3 thin omitted)
+- 352 nodes · 759 edges · 15 communities (12 shown, 3 thin omitted)
 - Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 52 edges (avg confidence: 0.88)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `9777b371`
+- Built from commit: `d934111d`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- db.ts
+- MushafManualView.tsx
 - Industry-Specific Design Languages
-- page.tsx
-- InfaqSettingsView.tsx
+- package.json
+- useAudioPlayer.ts
 - talaQids README
 - AudioEngineSingleton
 - compilerOptions
@@ -27,11 +27,9 @@
 - talaqids Logo Image
 - manifest.json
 - Talaqids App Icon (PNG)
-- google-drive-sync.ts
+- page.tsx
 - postcss.config.mjs
 - sw.js
-- dependencies
-- devDependencies
 
 ## God Nodes (most connected - your core abstractions)
 1. `AudioEngineSingleton` - 31 edges
@@ -39,11 +37,11 @@
 3. `HomePage()` - 19 edges
 4. `syncWithGoogleDrive()` - 16 edges
 5. `compilerOptions` - 16 edges
-6. `NowPlayingSheet()` - 14 edges
-7. `react` - 13 edges
-8. `talaQids PWA` - 13 edges
-9. `lucide-react` - 11 edges
-10. `ChildProfile` - 11 edges
+6. `NowPlayingSheet()` - 15 edges
+7. `react` - 14 edges
+8. `InfaqSettingsView()` - 13 edges
+9. `ChildProfile` - 13 edges
+10. `talaQids PWA` - 13 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Mobile App UI/UX Design Skill Guide` --semantically_similar_to--> `talaQids PWA`  [INFERRED] [semantically similar]
@@ -72,23 +70,23 @@
 - **talaqids Brand Visual System** — public_logo_talaqids_png_talaqids_wordmark, public_logo_talaqids_png_rounded_typeface, public_logo_talaqids_png_deep_green_palette, public_logo_talaqids_png_gold_accent [INFERRED 0.95]
 - **talaqids Logo Mark Composition** — public_logo_talaqids_png_open_book_icon, public_logo_talaqids_png_headset_motif, public_logo_talaqids_png_magnifier_q_mark, public_logo_talaqids_png_smiling_face_detail [INFERRED 0.95]
 
-## Communities (17 total, 3 thin omitted)
+## Communities (15 total, 3 thin omitted)
 
-### Community 0 - "db.ts"
-Cohesion: 0.11
-Nodes (35): DashboardAudioView(), DashboardAudioViewProps, InsightsViewProps, MushafManualView(), MushafManualViewProps, OnboardingModal(), OnboardingModalProps, ayahCache (+27 more)
+### Community 0 - "MushafManualView.tsx"
+Cohesion: 0.12
+Nodes (24): DashboardAudioViewProps, APP_BENEFITS, CATEGORIES, CategoryFilter, INSIGHT_ARTICLES, InsightArticle, InsightsViewProps, MushafManualViewProps (+16 more)
 
 ### Community 1 - "Industry-Specific Design Languages"
 Cohesion: 0.06
 Nodes (41): Mobile App UI Design Codebase Index, Quick Reference Guide, ASO Shots, Mobile App UI/UX Design Skill README, Ahead Case Study (Apple Design Award), AI/Tech Design Language, Design Process for Client/Product Work, The Comfort Trap (Consistency as Moat) (+33 more)
 
-### Community 2 - "page.tsx"
-Cohesion: 0.06
-Nodes (37): nextConfig, name, private, scripts, build, dev, lint, start (+29 more)
+### Community 2 - "package.json"
+Cohesion: 0.05
+Nodes (34): dependencies, dexie, dexie-react-hooks, lucide-react, next, react, react-dom, @vercel/analytics (+26 more)
 
-### Community 3 - "InfaqSettingsView.tsx"
-Cohesion: 0.11
-Nodes (26): INFAQ_OPTIONS, InfaqSettingsView(), InfaqSettingsViewProps, formatSeconds(), NowPlayingSheetProps, SLEEP_OPTIONS, ReciterProfileModal(), ReciterProfileModalProps (+18 more)
+### Community 3 - "useAudioPlayer.ts"
+Cohesion: 0.09
+Nodes (36): nextConfig, lucide-react, next, react, react-dom, DashboardAudioView(), EditChildModalProps, NowPlayingBarProps (+28 more)
 
 ### Community 4 - "talaQids README"
 Cohesion: 0.08
@@ -118,25 +116,17 @@ Nodes (9): background_color, description, display, icons, name, orientation, sho
 Cohesion: 0.39
 Nodes (9): Talaqids App Icon (PNG), Audio-Enabled Text Library Product Concept, Talaqids Brand Identity (Search + Read + Listen), Concentric Circular Composition with Heavy Outline, Color Palette: Deep Green on Warm Gold / White, Headphones Motif (Ear Cups with Green Headband Arc), Magnifying Glass Motif (Gold Ring with Handle), Open Book Motif (Dark Green Center) (+1 more)
 
-### Community 11 - "google-drive-sync.ts"
-Cohesion: 0.19
-Nodes (21): HomePage(), ensureAppSettings(), applyMergedPayloadToLocalDb(), buildLocalBackupPayload(), clearStoredAccessToken(), disconnectGoogleDrive(), downloadAppDataFile(), fetchUserEmail() (+13 more)
-
-### Community 14 - "dependencies"
-Cohesion: 0.25
-Nodes (8): dependencies, dexie, dexie-react-hooks, lucide-react, next, react, react-dom, @vercel/analytics
-
-### Community 15 - "devDependencies"
-Cohesion: 0.29
-Nodes (7): devDependencies, tailwindcss, @tailwindcss/postcss, @types/node, @types/react, @types/react-dom, typescript
+### Community 11 - "page.tsx"
+Cohesion: 0.11
+Nodes (44): ActiveTab, HomePage(), NAV_ITEMS, EditChildModal(), INFAQ_OPTIONS, InfaqSettingsView(), InfaqSettingsViewProps, InsightsView() (+36 more)
 
 ## Ambiguous Edges - Review These
 - `Audio-Enabled Text Library Product Concept` → `Talaqids Brand Identity (Search + Read + Listen)`  [AMBIGUOUS]
   public/icon_talaqids.png · relation: rationale_for
 
 ## Knowledge Gaps
-- **106 isolated node(s):** `nextConfig`, `name`, `version`, `private`, `dev` (+101 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 117 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **105 isolated node(s):** `nextConfig`, `name`, `version`, `private`, `dev` (+100 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 116 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **3 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
@@ -144,15 +134,15 @@ _Questions this graph is uniquely positioned to answer:_
 
 - **What is the exact relationship between `Audio-Enabled Text Library Product Concept` and `Talaqids Brand Identity (Search + Read + Listen)`?**
   _Edge tagged AMBIGUOUS (relation: rationale_for) - confidence is low._
-- **Why does `react` connect `page.tsx` to `db.ts`, `InfaqSettingsView.tsx`?**
-  _High betweenness centrality (0.053) - this node is a cross-community bridge._
-- **Why does `next` connect `page.tsx` to `db.ts`, `InfaqSettingsView.tsx`?**
-  _High betweenness centrality (0.032) - this node is a cross-community bridge._
-- **Why does `useAudioPlayer()` connect `AudioEngineSingleton` to `db.ts`, `page.tsx`, `InfaqSettingsView.tsx`?**
+- **Why does `react` connect `useAudioPlayer.ts` to `MushafManualView.tsx`, `package.json`, `page.tsx`?**
+  _High betweenness centrality (0.049) - this node is a cross-community bridge._
+- **Why does `next` connect `useAudioPlayer.ts` to `package.json`, `page.tsx`?**
+  _High betweenness centrality (0.035) - this node is a cross-community bridge._
+- **Why does `useAudioPlayer()` connect `AudioEngineSingleton` to `page.tsx`, `MushafManualView.tsx`, `useAudioPlayer.ts`?**
   _High betweenness centrality (0.031) - this node is a cross-community bridge._
 - **What connects `nextConfig`, `name`, `version` to the rest of the system?**
-  _106 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `db.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.10631229235880399 - nodes in this community are weakly interconnected._
+  _105 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `MushafManualView.tsx` be split into smaller, more focused modules?**
+  _Cohesion score 0.11904761904761904 - nodes in this community are weakly interconnected._
 - **Should `Industry-Specific Design Languages` be split into smaller, more focused modules?**
   _Cohesion score 0.061224489795918366 - nodes in this community are weakly interconnected._
