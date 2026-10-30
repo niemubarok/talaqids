@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import {
   ArrowRight,
   ArrowUpRight,
@@ -8,13 +9,16 @@ import {
   Calendar,
   CheckCircle2,
   Headphones,
+  Pause,
+  Play,
   Repeat,
   Sliders,
   Sparkles,
   Users,
 } from 'lucide-react';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
-import { getJuzMeta, RECITERS, SURAHS } from '@/lib/quran-metadata';
+import { getJuzMeta, RECITERS, SURAHS, type Reciter } from '@/lib/quran-metadata';
+import { ReciterProfileModal } from '@/components/ReciterProfileModal';
 import {
   computeParentRoleCounts,
   type ChildProfile,
@@ -43,10 +47,12 @@ export function DashboardAudioView({
   onOpenMushaf,
   onOverrideJuz,
   onOpenInfaq,
+  onOpenPlayer,
 }: DashboardAudioViewProps) {
-  const { state, restartFromBeginning } = useAudioPlayer();
+  const { state, restartFromBeginning, togglePlay } = useAudioPlayer();
 
   const [showOverrideMenu, setShowOverrideMenu] = useState(false);
+  const [showReciterProfile, setShowReciterProfile] = useState(false);
 
   const juzMeta = getJuzMeta(cycle.currentJuz);
   const startSurah = SURAHS[juzMeta.startSurah];
@@ -286,12 +292,32 @@ export function DashboardAudioView({
               Juz {cycle.currentJuz} · {juzMeta.nameTransliteration}
             </h2>
           </div>
-          <span
-            dir="rtl"
-            className="rounded-xl bg-[#F6F0E4] px-2.5 py-1 font-arabic text-base text-[#1E4C40]"
-          >
-            {juzMeta.nameArabic}
-          </span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => void togglePlay()}
+              className="flex items-center gap-1.5 rounded-full bg-[#1E4C40] px-3 py-1.5 text-xs font-bold text-[#F7EFD9] shadow-[0_8px_18px_-6px_rgba(16,46,39,0.7)] transition hover:bg-[#275E50] active:scale-95"
+              aria-label={state.isPlaying ? 'Jeda Murottal' : 'Putar Murottal'}
+            >
+              {state.isPlaying ? (
+                <>
+                  <Pause className="h-3.5 w-3.5 fill-current" />
+                  <span>Jeda</span>
+                </>
+              ) : (
+                <>
+                  <Play className="h-3.5 w-3.5 translate-x-[0.5px] fill-current" />
+                  <span>Putar</span>
+                </>
+              )}
+            </button>
+            <span
+              dir="rtl"
+              className="rounded-xl bg-[#F6F0E4] px-2.5 py-1 font-arabic text-base text-[#1E4C40]"
+            >
+              {juzMeta.nameArabic}
+            </span>
+          </div>
         </div>
 
         <div className="mt-3 grid grid-cols-3 gap-2">
@@ -317,17 +343,32 @@ export function DashboardAudioView({
             <p className="text-[9.5px] text-[#6B7A72]">20 halaman standar</p>
           </div>
 
-          <div className="surface-soft px-3 py-2">
-            <p className="text-[9px] font-bold uppercase tracking-wider text-[#8A968F]">
-              Pos Ayat Saat Ini
-            </p>
-            <p className="mt-0.5 text-[11px] font-extrabold text-[#15231E]">
-              Track {state.currentTrackIndex + 1}/{state.tracks.length}
-            </p>
-            <p className="truncate text-[9.5px] text-[#6B7A72]">
-              {reciter.name.replace('Syaikh ', '')}
-            </p>
-          </div>
+          <button
+            type="button"
+            onClick={() => setShowReciterProfile(true)}
+            className="surface-soft flex items-center gap-2.5 px-3 py-2 text-left transition hover:bg-[#1E4C40]/5 active:scale-98"
+          >
+            <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-xl border border-[#1E4C40]/15 bg-[#15352C] shadow-2xs">
+              <Image
+                src={reciter.photoUrl}
+                alt={reciter.name}
+                fill
+                sizes="36px"
+                className="object-cover object-top"
+              />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[9px] font-bold uppercase tracking-wider text-[#8A968F]">
+                Qari Murottal
+              </p>
+              <p className="truncate text-[11px] font-extrabold text-[#15231E]">
+                {reciter.shortName}
+              </p>
+              <p className="truncate text-[9.5px] font-semibold text-[#2F6B5B]">
+                Lihat profil &gt;
+              </p>
+            </div>
+          </button>
         </div>
 
         <div className="mt-3 flex items-center justify-between border-t border-[#1E4C40]/8 pt-2.5">
@@ -452,6 +493,15 @@ export function DashboardAudioView({
           </p>
         </div>
       </div>
+
+      {/* Reciter Profile Modal */}
+      <ReciterProfileModal
+        reciter={showReciterProfile ? reciter : null}
+        activeReciterId={state.reciterId}
+        isProUser={isPro}
+        onClose={() => setShowReciterProfile(false)}
+        onUnlockRequest={onOpenInfaq}
+      />
     </div>
   );
 }

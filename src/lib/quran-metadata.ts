@@ -25,7 +25,16 @@ export interface JuzMeta {
 export interface Reciter {
   id: string;
   name: string;
+  shortName: string;
+  arabicName: string;
+  photoUrl: string;
   style: string;
+  roleTitle: string;
+  origin: string;
+  period: string;
+  bio: string;
+  methodologyNote: string;
+  characteristics: string[];
   bitrate: '64kbps' | '128kbps';
   subfolder: string;
   isPro: boolean;
@@ -35,7 +44,21 @@ export const RECITERS: Reciter[] = [
   {
     id: 'al_husary',
     name: 'Syaikh Mahmud Khalil Al-Husary',
+    shortName: 'Syaikh Al-Husary',
+    arabicName: 'الشيخ محمود خليل الحصري',
+    photoUrl: '/images/reciters/al_husary.jpg',
     style: 'Murattal (Tartil Jelas & Tenang)',
+    roleTitle: "Syaikhul Maqari' Al-Mishriyyah (Guru Besar Qari Mesir)",
+    origin: 'Tanta, Mesir',
+    period: '1917 – 1980 M',
+    bio: 'Tokoh legendaris qari dunia yang pertama kali merekam Al-Quran mushaf murattal lengkap dalam sejarah penyiaran dunia Islam (1961). Dikenal sebagai pelopor tajwid paling otentik dan disiplin makhraj tertinggi.',
+    methodologyNote:
+      'Rujukan nomor 1 untuk bayi dan anak-anak sesuai rekomendasi para ulama talaqqi & Ustaz Adi Hidayat. Ketukan tartil stabil, tempo lambat, dan pengucapan makhraj yang sangat terartikulasi memudahkan otak bayi memetakan fonem bahasa Arab Al-Quran sejak dini.',
+    characteristics: [
+      'Makharijul huruf paling presisi & standar rujukan talaqqi dunia',
+      'Tempo tartil lambat dan berketukan ritmis stabil',
+      'Tanpa modulasi nada berlebihan sehingga fokus ke pelafalan huruf murni',
+    ],
     bitrate: '64kbps',
     subfolder: 'Husary_64kbps',
     isPro: false, // Free default reciter
@@ -43,7 +66,21 @@ export const RECITERS: Reciter[] = [
   {
     id: 'al_minshawi',
     name: 'Syaikh Muhammad Siddiq Al-Minshawi',
+    shortName: 'Syaikh Al-Minshawi',
+    arabicName: 'الشيخ محمد صديق المنشاوي',
+    photoUrl: '/images/reciters/al_minshawi.jpg',
     style: 'Murattal (Khas Khusyu)',
+    roleTitle: "Al-Shawt Al-Baki (Sang Suara Menangis yang Khusyu')",
+    origin: 'Sohag, Mesir',
+    period: '1920 – 1969 M',
+    bio: 'Lahir dari dinasti ulama qari terkemuka Mesir. Suaranya yang melankolis dan penuh perenungan membuatnya dijuluki "Al-Shawt Al-Baki". Rekaman murattal beliau memancarkan keteduhan dan kedalaman spiritual yang luar biasa.',
+    methodologyNote:
+      'Sangat menenangkan untuk jam istirahat atau tidur bayi (sleep routine). Gelombang suaranya yang teduh dan stabil membantu menurunkan tingkat stimulasi berlebih serta menstimulasi rasa aman bagi anak.',
+    characteristics: [
+      'Karakter suara sangat khusyu, teduh, dan menenangkan jiwa',
+      'Sangat ideal diputar saat fase pengantar tidur dan istirahat malam',
+      'Kualitas audio jernih 128kbps',
+    ],
     bitrate: '128kbps',
     subfolder: 'Minshawy_Murattal_128kbps',
     isPro: true,
@@ -51,7 +88,21 @@ export const RECITERS: Reciter[] = [
   {
     id: 'alafasy',
     name: 'Syaikh Mishary Rashid Alafasy',
+    shortName: 'Syaikh Mishary Alafasy',
+    arabicName: 'الشيخ مشاري بن راشد العفاسي',
+    photoUrl: '/images/reciters/alafasy.jpg',
     style: 'Murattal (Melodius Berirama)',
+    roleTitle: 'Imam Masjid Agung Kuwait & Tokoh Qari Kontemporer',
+    origin: 'Kuwait',
+    period: '1976 – sekarang',
+    bio: 'Lulusan Fakultas Al-Quran dan Studi Islam Universitas Islam Madinah dengan spesialisasi 10 Qira\'at. Tokoh qari kontemporer paling berpengaruh di dunia modern dengan gaya lantunan yang merdu, segar, dan dinamis.',
+    methodologyNote:
+      'Irama melodius yang ceria dan segar sangat disukai anak-anak saat fase aktif bermain di pagi atau siang hari. Membantu anak merasa bahagia dan mudah akrab dengan lantunan ayat Al-Quran.',
+    characteristics: [
+      'Lantunan melodius berirama segar yang disukai anak',
+      'Artikulasi tajwid tegas dengan tempo modern yang dinamis',
+      'Sangat efektif untuk sesi pendengaran di pagi dan siang hari',
+    ],
     bitrate: '128kbps',
     subfolder: 'Alafasy_128kbps',
     isPro: true,
@@ -59,7 +110,21 @@ export const RECITERS: Reciter[] = [
   {
     id: 'abdul_basit',
     name: 'Syaikh Abdul Basit Abdul Samad',
+    shortName: 'Syaikh Abdul Basit',
+    arabicName: 'الشيخ عبد الباسط عبد الصمد',
+    photoUrl: '/images/reciters/abdul_basit.jpg',
     style: 'Murattal (Artikulasi Kuat)',
+    roleTitle: 'Golden Voice (Pita Suara Emas Dunia Islam)',
+    origin: 'Armant, Mesir',
+    period: '1927 – 1988 M',
+    bio: 'Presiden pertama Asosiasi Qari Mesir (1970) yang melegenda di seluruh dunia Islam. Dikenal dengan kemampuan kontrol nafas tak tertandingi dan vokal berwibawa yang menggetarkan sanubari pendengarnya.',
+    methodologyNote:
+      'Vokal yang tegas dan kaya spektrum harmonik menguatkan kepekaan auditory cortex anak terhadap perbedaan resonansi bunyi tebal (tafkhim) dan tipis (tarqiq) dalam bahasa Arab Al-Quran.',
+    characteristics: [
+      'Vokal berkarisma tinggi dengan resonansi nada yang berwibawa',
+      'Ketepatan ghunnah dan mad yang sangat disiplin',
+      'Melatih kepekaan pendengaran vokal dan dinamika suara anak',
+    ],
     bitrate: '64kbps',
     subfolder: 'Abdul_Basit_Murattal_64kbps',
     isPro: true,

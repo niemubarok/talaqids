@@ -2,9 +2,10 @@
 
 import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
-import { Baby, Calendar, CheckCircle2, Cloud, Loader2, Sparkles, Volume2 } from 'lucide-react';
+import { Baby, Calendar, CheckCircle2, Cloud, Info, Loader2, Sparkles, Volume2 } from 'lucide-react';
 import { calculateCycleStatus, formatChildAge } from '@/lib/cycle-math';
-import { getJuzMeta, RECITERS } from '@/lib/quran-metadata';
+import { getJuzMeta, RECITERS, type Reciter } from '@/lib/quran-metadata';
+import { ReciterProfileModal } from '@/components/ReciterProfileModal';
 import { createChildProfile } from '@/lib/db';
 import { syncWithGoogleDrive } from '@/lib/google-drive-sync';
 
@@ -32,6 +33,7 @@ export function OnboardingModal({
   const [useCustomStart, setUseCustomStart] = useState(false);
   const [startDate, setStartDate] = useState(todayStr);
   const [reciterId, setReciterId] = useState('al_husary');
+  const [showReciterProfile, setShowReciterProfile] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isRestoringCloud, setIsRestoringCloud] = useState(false);
   const [restoreError, setRestoreError] = useState<string | null>(null);
@@ -40,7 +42,7 @@ export function OnboardingModal({
     setIsRestoringCloud(true);
     setRestoreError(null);
     try {
-      await syncWithGoogleDrive({ interactive: true });
+      await syncWithGoogleDrive({ interactive: true, allowRestore: true });
       onCompleted();
     } catch (err) {
       setRestoreError(
@@ -218,21 +220,49 @@ export function OnboardingModal({
           </div>
 
           <div>
-            <label className={labelClass}>Qari utama (ramah pendengaran bayi)</label>
-            <div className="flex items-center gap-3 rounded-2xl border border-[#1E4C40]/10 bg-[#FFFCF5] p-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1E4C40]/8 text-[#1E4C40]">
-                <Volume2 className="h-4 w-4" />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-[12px] font-extrabold text-[#15231E]">
-                  {RECITERS.find((r) => r.id === reciterId)?.name || RECITERS[0].name}
-                </p>
-                <p className="text-[10px] text-[#8A968F]">
-                  {RECITERS.find((r) => r.id === reciterId)?.style || RECITERS[0].style}
-                </p>
-              </div>
-              <CheckCircle2 className="h-4 w-4 shrink-0 text-[#2F6B5B]" />
+            <div className="flex items-center justify-between">
+              <label className={labelClass}>Qari utama (ramah pendengaran bayi)</label>
+              <button
+                type="button"
+                onClick={() => setShowReciterProfile(true)}
+                className="inline-flex items-center gap-1 text-[10px] font-extrabold text-[#1E4C40] hover:underline"
+              >
+                <Info className="h-3 w-3 text-[#2F6B5B]" />
+                Lihat Profil
+              </button>
             </div>
+            {(() => {
+              const currentReciter =
+                RECITERS.find((r) => r.id === reciterId) || RECITERS[0];
+              return (
+                <div className="flex items-center gap-3 rounded-2xl border border-[#1E4C40]/10 bg-[#FFFCF5] p-2.5">
+                  <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-xl border border-[#1E4C40]/15 bg-[#15352C] shadow-xs">
+                    <Image
+                      src={currentReciter.photoUrl}
+                      alt={currentReciter.name}
+                      fill
+                      sizes="44px"
+                      className="object-cover object-top"
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[12px] font-extrabold text-[#15231E]">
+                      {currentReciter.name}
+                    </p>
+                    <p className="truncate text-[10px] text-[#8A968F]">
+                      {currentReciter.style} · {currentReciter.origin}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowReciterProfile(true)}
+                    className="shrink-0 rounded-xl border border-[#1E4C40]/10 bg-white/90 px-2 py-1 text-[10px] font-bold text-[#1E4C40] transition hover:bg-[#1E4C40]/8 active:scale-95"
+                  >
+                    Profil
+                  </button>
+                </div>
+              );
+            })()}
           </div>
 
           <div className="flex items-center gap-2.5 pt-1">
@@ -278,6 +308,17 @@ export function OnboardingModal({
           )}
         </form>
       </div>
+
+      <ReciterProfileModal
+        reciter={showReciterProfile ? (RECITERS.find((r) => r.id === reciterId) || RECITERS[0]) : null}
+        activeReciterId={reciterId}
+        isProUser={false}
+        onClose={() => setShowReciterProfile(false)}
+        onSelectReciter={(r) => {
+          setReciterId(r.id);
+          setShowReciterProfile(false);
+        }}
+      />
     </div>
   );
 }

@@ -211,29 +211,62 @@ export function mergeCloudAndLocalData(
   local: CloudBackupPayload,
   remote: CloudBackupPayload
 ): CloudBackupPayload {
-  // 1. Merge Children by UUID (Latest updatedAt wins)
+  // 1. Merge and Deduplicate Children
+  // Match by UUID first, then fallback to normalized name + birthDate
+  // to avoid duplicates if the same child was registered on multiple devices before sync.
   const childrenMap = new Map<string, ChildProfile>();
+  const idAliases = new Map<string, string>(); // aliasId -> canonicalId
+  const fingerprintToId = new Map<string, string>();
+
+  const getChildFingerprint = (c: ChildProfile) =>
+    `${(c.name || '').trim().toLowerCase()}__${c.birthDate}`;
+
+  const processChild = (child: ChildProfile) => {
+    const fp = getChildFingerprint(child);
+    const existingIdByFp = fingerprintToId.get(fp);
+
+    if (childrenMap.has(child.id)) {
+      const existing = childrenMap.get(child.id)!;
+      const childTime = Date.parse(child.updatedAt || child.createdAt || '1970-01-01');
+      const existingTime = Date.parse(existing.updatedAt || existing.createdAt || '1970-01-01');
+      if (childTime >= existingTime) {
+        childrenMap.set(child.id, child);
+      }
+      fingerprintToId.set(fp, child.id);
+    } else if (existingIdByFp && childrenMap.has(existingIdByFp)) {
+      // Same child name & birthdate, but different UUID generated on another device
+      const canonicalId = existingIdByFp;
+      idAliases.set(child.id, canonicalId);
+      const existing = childrenMap.get(canonicalId)!;
+      const childTime = Date.parse(child.updatedAt || child.createdAt || '1970-01-01');
+      const existingTime = Date.parse(existing.updatedAt || existing.createdAt || '1970-01-01');
+      if (childTime >= existingTime) {
+        childrenMap.set(canonicalId, {
+          ...child,
+          id: canonicalId,
+        });
+      }
+    } else {
+      childrenMap.set(child.id, child);
+      fingerprintToId.set(fp, child.id);
+    }
+  };
+
   for (const child of remote.children || []) {
-    childrenMap.set(child.id, child);
+    processChild(child);
   }
   for (const localChild of local.children || []) {
-    const existing = childrenMap.get(localChild.id);
-    if (!existing) {
-      childrenMap.set(localChild.id, localChild);
-    } else {
-      const localTime = Date.parse(localChild.updatedAt || localChild.createdAt || '1970-01-01');
-      const remoteTime = Date.parse(existing.updatedAt || existing.createdAt || '1970-01-01');
-      childrenMap.set(localChild.id, localTime >= remoteTime ? localChild : existing);
-    }
+    processChild(localChild);
   }
 
   // 2. Merge Daily Progress by `${childId}__${date}`
-  // Set union for pagesCompleted: Array.from(new Set([...localPages, ...remotePages]))
+  // Resolve childId aliases from deduplicated children
   const progressMap = new Map<string, Omit<DailyProgress, 'id'>>();
   for (const item of remote.progress || []) {
-    const key = `${item.childId}__${item.date}`;
+    const resolvedChildId = idAliases.get(item.childId) || item.childId;
+    const key = `${resolvedChildId}__${item.date}`;
     progressMap.set(key, {
-      childId: item.childId,
+      childId: resolvedChildId,
       date: item.date,
       juzNumber: item.juzNumber,
       listenMinutes: item.listenMinutes || 0,
@@ -246,11 +279,12 @@ export function mergeCloudAndLocalData(
   }
 
   for (const localItem of local.progress || []) {
-    const key = `${localItem.childId}__${localItem.date}`;
+    const resolvedChildId = idAliases.get(localItem.childId) || localItem.childId;
+    const key = `${resolvedChildId}__${localItem.date}`;
     const remoteItem = progressMap.get(key);
     if (!remoteItem) {
       progressMap.set(key, {
-        childId: localItem.childId,
+        childId: resolvedChildId,
         date: localItem.date,
         juzNumber: localItem.juzNumber,
         listenMinutes: localItem.listenMinutes || 0,
@@ -297,7 +331,7 @@ export function mergeCloudAndLocalData(
       }
 
       progressMap.set(key, {
-        childId: localItem.childId,
+        childId: resolvedChildId,
         date: localItem.date,
         juzNumber: newer.juzNumber,
         listenMinutes: Math.max(localItem.listenMinutes || 0, remoteItem.listenMinutes || 0),
@@ -317,7 +351,9 @@ export function mergeCloudAndLocalData(
   const isProUser = Boolean(local.settings.isProUser || remote.settings.isProUser);
   const mergedChildren = Array.from(childrenMap.values());
   const preferredActiveChildId =
+    (local.settings.activeChildId && idAliases.get(local.settings.activeChildId)) ||
     local.settings.activeChildId ||
+    (remote.settings.activeChildId && idAliases.get(remote.settings.activeChildId)) ||
     remote.settings.activeChildId ||
     mergedChildren[0]?.id;
 
@@ -376,6 +412,8 @@ export async function applyMergedPayloadToLocalDb(
   }
 ): Promise<void> {
   await db.transaction('rw', db.children, db.progress, db.settings, async () => {
+    // Replace all children with the deduplicated and merged children list
+    await db.children.clear();
     await db.children.bulkPut(merged.children);
 
     for (const item of merged.progress) {
@@ -496,13 +534,12 @@ async function uploadAppDataFile(
  */
 export async function syncWithGoogleDrive(options?: {
   interactive?: boolean;
+  allowRestore?: boolean;
 }): Promise<{ syncedAt: string; email?: string; fileId: string }> {
   const settings = await ensureAppSettings();
-  if (!settings.isProUser) {
-    throw new Error('Fitur sinkronisasi Google Drive khusus untuk Tier Muhsinin.');
-  }
-  const clientId = getConfiguredGoogleClientId();
+  const allowRestore = options?.allowRestore ?? false;
 
+  const clientId = getConfiguredGoogleClientId();
   if (!clientId) {
     throw new Error(
       'Layanan Google Drive belum dikonfigurasi (NEXT_PUBLIC_GOOGLE_CLIENT_ID belum diatur di .env.local).'
@@ -525,6 +562,17 @@ export async function syncWithGoogleDrive(options?: {
     settings.googleDriveEmail ? Promise.resolve(settings.googleDriveEmail) : fetchUserEmail(accessToken),
   ]);
 
+  if (!remoteFile) {
+    if (allowRestore) {
+      throw new Error(
+        'Belum ada data backup talaQids yang ditemukan di Google Drive akun ini.'
+      );
+    }
+    if (!settings.isProUser) {
+      throw new Error('Fitur sinkronisasi Google Drive khusus untuk Tier Muhsinin.');
+    }
+  }
+
   let finalPayload = localPayload;
   if (remoteFile) {
     const remotePayload = await downloadAppDataFile(accessToken, remoteFile.id);
@@ -533,7 +581,18 @@ export async function syncWithGoogleDrive(options?: {
     }
   }
 
-  const fileId = await uploadAppDataFile(accessToken, finalPayload, remoteFile?.id);
+  // Check Pro / Muhsinin entitlement after reading cloud payload (cloud might already be Muhsinin)
+  const isEntitledPro = Boolean(settings.isProUser || finalPayload.settings?.isProUser);
+  if (!isEntitledPro && !allowRestore) {
+    throw new Error('Fitur sinkronisasi Google Drive khusus untuk Tier Muhsinin.');
+  }
+
+  // Upload back merged data only if user is Muhsinin or in regular sync mode
+  let fileId = remoteFile?.id || '';
+  if (isEntitledPro || !remoteFile) {
+    fileId = await uploadAppDataFile(accessToken, finalPayload, remoteFile?.id);
+  }
+
   const syncedAt = new Date().toISOString();
 
   await applyMergedPayloadToLocalDb(finalPayload, {

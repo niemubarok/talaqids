@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import {
   BookOpen,
   CheckCircle2,
   ChevronDown,
   Download,
+  Info,
   Loader2,
   Lock,
   Moon,
@@ -16,7 +18,8 @@ import {
   SkipForward,
   Volume2,
 } from 'lucide-react';
-import { RECITERS } from '@/lib/quran-metadata';
+import { RECITERS, type Reciter } from '@/lib/quran-metadata';
+import { ReciterProfileModal } from '@/components/ReciterProfileModal';
 import { useAudioPlayer, type SleepTimerMode } from '@/hooks/useAudioPlayer';
 import { useAyahText } from '@/hooks/useAyahText';
 
@@ -68,6 +71,7 @@ export function NowPlayingSheet({
   const { verse, isLoading } = useAyahText(track);
 
   const [panel, setPanel] = useState<'sleep' | 'volume' | 'reciter' | null>(null);
+  const [selectedProfileReciter, setSelectedProfileReciter] = useState<Reciter | null>(null);
   const [dragY, setDragY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const startY = useRef<number | null>(null);
@@ -229,55 +233,97 @@ export function NowPlayingSheet({
 
               <div className="relative mt-4 flex items-center justify-between gap-3 border-t border-dashed border-[#1E4C40]/15 pt-3">
                 {panel === 'reciter' && (
-                  <div className="surface absolute inset-x-0 bottom-full z-30 mb-2.5 border border-[#1E4C40]/15 bg-[#FFFCF5] p-3 shadow-[0_-14px_34px_-8px_rgba(21,35,30,0.24)]">
-                    <p className="mb-2 px-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#6B7A72]">
-                      Pilih Qari Murottal
-                    </p>
+                  <div className="surface absolute inset-x-0 bottom-full z-30 mb-2.5 max-h-[340px] overflow-y-auto border border-[#1E4C40]/15 bg-[#FFFCF5] p-3 shadow-[0_-14px_34px_-8px_rgba(21,35,30,0.24)]">
+                    <div className="mb-2 flex items-center justify-between px-1">
+                      <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#6B7A72]">
+                        Pilih Qari Murottal
+                      </p>
+                      <span className="text-[9.5px] font-semibold text-[#8A968F]">
+                        Ketuk ikon info untuk profil
+                      </span>
+                    </div>
                     <div className="space-y-1.5">
                       {RECITERS.map((item) => {
                         const isSelected = item.id === state.reciterId;
                         const isLocked = item.isPro && !isPro;
                         return (
-                          <button
+                          <div
                             key={item.id}
-                            type="button"
-                            onClick={() => {
-                              if (isLocked) {
-                                setPanel(null);
-                                onClose();
-                                onOpenInfaq();
-                                return;
-                              }
-                              setReciter(item.id);
-                              setPanel(null);
-                            }}
-                            className={`flex w-full items-center justify-between gap-2 rounded-2xl px-3 py-2 text-left transition ${
+                            className={`flex items-center justify-between gap-2 rounded-2xl p-1.5 transition ${
                               isSelected
                                 ? 'bg-[#1E4C40] text-[#F3E7CB]'
                                 : 'bg-[#F6F0E4]/80 text-[#15231E] hover:bg-[#1E4C40]/8'
                             }`}
                           >
-                            <div className="min-w-0">
-                              <p className="truncate text-[11.5px] font-extrabold">
-                                {item.name}
-                              </p>
-                              <p
-                                className={`truncate text-[9.5px] font-medium ${
-                                  isSelected ? 'text-[#F3E7CB]/75' : 'text-[#6B7A72]'
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (isLocked) {
+                                  setSelectedProfileReciter(item);
+                                  return;
+                                }
+                                setReciter(item.id);
+                                setPanel(null);
+                              }}
+                              className="flex min-w-0 flex-1 items-center gap-2.5 text-left"
+                            >
+                              <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-xl border border-white/20 bg-[#15352C]">
+                                <Image
+                                  src={item.photoUrl}
+                                  alt={item.name}
+                                  fill
+                                  sizes="36px"
+                                  className="object-cover object-top"
+                                />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="truncate text-[11.5px] font-extrabold">
+                                  {item.shortName}
+                                </p>
+                                <p
+                                  className={`truncate text-[9.5px] font-medium ${
+                                    isSelected ? 'text-[#F3E7CB]/75' : 'text-[#6B7A72]'
+                                  }`}
+                                >
+                                  {item.style} • {item.bitrate}
+                                </p>
+                              </div>
+                            </button>
+
+                            <div className="flex shrink-0 items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedProfileReciter(item);
+                                }}
+                                title="Lihat profil qari"
+                                className={`flex h-7 w-7 items-center justify-center rounded-lg transition ${
+                                  isSelected
+                                    ? 'bg-white/15 text-[#F3E7CB] hover:bg-white/25'
+                                    : 'bg-black/5 text-[#1E4C40] hover:bg-black/10'
                                 }`}
                               >
-                                {item.style} • {item.bitrate}
-                              </p>
+                                <Info className="h-3.5 w-3.5" />
+                              </button>
+
+                              {isLocked ? (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedProfileReciter(item);
+                                  }}
+                                  className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#C89B4E]/25 px-2 py-0.5 text-[9px] font-extrabold text-[#9C7330]"
+                                >
+                                  <Lock className="h-2.5 w-2.5" />
+                                  Muhsinin
+                                </button>
+                              ) : isSelected ? (
+                                <CheckCircle2 className="h-4 w-4 shrink-0 text-[#EAD8AF]" />
+                              ) : null}
                             </div>
-                            {isLocked ? (
-                              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#C89B4E]/20 px-2 py-0.5 text-[9px] font-extrabold text-[#9C7330]">
-                                <Lock className="h-2.5 w-2.5" />
-                                Muhsinin
-                              </span>
-                            ) : isSelected ? (
-                              <CheckCircle2 className="h-4 w-4 shrink-0 text-[#EAD8AF]" />
-                            ) : null}
-                          </button>
+                          </div>
                         );
                       })}
                     </div>
@@ -287,9 +333,18 @@ export function NowPlayingSheet({
                 <button
                   type="button"
                   onClick={() => setPanel(panel === 'reciter' ? null : 'reciter')}
-                  className="inline-flex min-w-0 items-center gap-1.5 rounded-full bg-[#1E4C40]/8 px-3 py-1.5 text-left text-[11px] font-bold text-[#1E4C40] transition hover:bg-[#1E4C40]/14 active:scale-95"
+                  className="inline-flex min-w-0 items-center gap-2 rounded-full bg-[#1E4C40]/8 px-2.5 py-1 text-left text-[11px] font-bold text-[#1E4C40] transition hover:bg-[#1E4C40]/14 active:scale-95"
                 >
-                  <span className="truncate">{reciter.name}</span>
+                  <div className="relative h-5 w-5 shrink-0 overflow-hidden rounded-full border border-[#1E4C40]/20 bg-[#15352C]">
+                    <Image
+                      src={reciter.photoUrl}
+                      alt={reciter.name}
+                      fill
+                      sizes="20px"
+                      className="object-cover object-top"
+                    />
+                  </div>
+                  <span className="truncate">{reciter.shortName}</span>
                   <ChevronDown
                     className={`h-3.5 w-3.5 shrink-0 transition-transform duration-200 ${
                       panel === 'reciter' ? 'rotate-180' : ''
@@ -536,6 +591,23 @@ export function NowPlayingSheet({
           </div>
         </div>
       </div>
+
+      {/* Reciter Profile Modal */}
+      <ReciterProfileModal
+        reciter={selectedProfileReciter}
+        activeReciterId={state.reciterId}
+        isProUser={isPro}
+        onClose={() => setSelectedProfileReciter(null)}
+        onSelectReciter={(r) => {
+          setReciter(r.id);
+          setPanel(null);
+        }}
+        onUnlockRequest={() => {
+          setPanel(null);
+          onClose();
+          onOpenInfaq();
+        }}
+      />
     </div>
   );
 }

@@ -1,0 +1,242 @@
+{
+  "next.config.ts": {
+    "mtime": 1793242033.1576235,
+    "seen": 1793259222.580205,
+    "ast_hash": "fb1fa665688f04242b8d0f74fc62fae1",
+    "semantic_hash": "fb1fa665688f04242b8d0f74fc62fae1"
+  },
+  "package.json": {
+    "mtime": 1793242024.5897982,
+    "seen": 1793259222.580205,
+    "ast_hash": "e2fa15be39db19da93a824bbd157f881",
+    "semantic_hash": "e2fa15be39db19da93a824bbd157f881"
+  },
+  "postcss.config.mjs": {
+    "mtime": 1793242045.0429235,
+    "seen": 1793259222.580205,
+    "ast_hash": "481fac0fdecd70e1821cc30b86030c1a",
+    "semantic_hash": "481fac0fdecd70e1821cc30b86030c1a"
+  },
+  "public/manifest.json": {
+    "mtime": 1793260699.847348,
+    "seen": 1793261496.8086712,
+    "ast_hash": "fab5da9282e1381c5d463f07e15da772",
+    "semantic_hash": ""
+  },
+  "public/sw.js": {
+    "mtime": 1793261255.9120274,
+    "seen": 1793261496.8086712,
+    "ast_hash": "21198c794d0a8aed0d635644d98dbbbb",
+    "semantic_hash": ""
+  },
+  "skills-lock.json": {
+    "mtime": 1793237489.7256236,
+    "seen": 1793259222.580205,
+    "ast_hash": "b59f8264bb668befe258c8a710e19196",
+    "semantic_hash": "b59f8264bb668befe258c8a710e19196"
+  },
+  "src/app/layout.tsx": {
+    "mtime": 1793260699.8925393,
+    "seen": 1793261496.8086712,
+    "ast_hash": "18a8382a8ce46b27503b43235e8400ac",
+    "semantic_hash": ""
+  },
+  "src/app/page.tsx": {
+    "mtime": 1793261043.5320282,
+    "seen": 1793261496.8086712,
+    "ast_hash": "01235a72426075666b84fcf0a644e6ba",
+    "semantic_hash": ""
+  },
+  "src/components/DashboardAudioView.tsx": {
+    "mtime": 1793260529.4922872,
+    "seen": 1793261496.8086712,
+    "ast_hash": "9d769d9e2db4f74ab108b8eed8dd4cec",
+    "semantic_hash": ""
+  },
+  "src/components/InfaqSettingsView.tsx": {
+    "mtime": 1793260649.9300063,
+    "seen": 1793261496.8086712,
+    "ast_hash": "d2d08cd1cd84b1166e239e073e97ef61",
+    "semantic_hash": ""
+  },
+  "src/components/MushafManualView.tsx": {
+    "mtime": 1793260614.3936205,
+    "seen": 1793261496.8086712,
+    "ast_hash": "bb27e27e07baf6ce64c7fa0517f5c3c5",
+    "semantic_hash": ""
+  },
+  "src/components/OnboardingModal.tsx": {
+    "mtime": 1793260678.8957615,
+    "seen": 1793261496.8086712,
+    "ast_hash": "57224d452f20bf45894dec7fae4e12b2",
+    "semantic_hash": ""
+  },
+  "src/hooks/useAudioPlayer.ts": {
+    "mtime": 1793261024.9582977,
+    "seen": 1793261496.8086712,
+    "ast_hash": "739f4d9c46b6f600c2cf8b1af12a90ab",
+    "semantic_hash": ""
+  },
+  "src/lib/cycle-math.ts": {
+    "mtime": 1793242960.0808308,
+    "seen": 1793259222.580205,
+    "ast_hash": "4e66811d0cd631c39a0896f295344e31",
+    "semantic_hash": "4e66811d0cd631c39a0896f295344e31"
+  },
+  "src/lib/db.ts": {
+    "mtime": 1793256512.3780985,
+    "seen": 1793259222.580205,
+    "ast_hash": "67fde79e63f891b3ac645fc7e6e709c2",
+    "semantic_hash": "67fde79e63f891b3ac645fc7e6e709c2"
+  },
+  "src/lib/quran-api.ts": {
+    "mtime": 1793242964.3796935,
+    "seen": 1793259222.580205,
+    "ast_hash": "2d89f76ee83c7440d11cc546f538d3b2",
+    "semantic_hash": "2d89f76ee83c7440d11cc546f538d3b2"
+  },
+  "src/lib/quran-metadata.ts": {
+    "mtime": 1793256509.501616,
+    "seen": 1793259222.580205,
+    "ast_hash": "0efabb4ba1a21aa67438636f6b877b77",
+    "semantic_hash": "0efabb4ba1a21aa67438636f6b877b77"
+  },
+  "tsconfig.json": {
+    "mtime": 1793242029.8486512,
+    "seen": 1793259222.580205,
+    "ast_hash": "6abdc928f431c839cc04d9e13060b036",
+    "semantic_hash": "6abdc928f431c839cc04d9e13060b036"
+  },
+  ".agent/skills/audio-engine.md": {
+    "mtime": 1793237523.662056,
+    "seen": 1793259222.580205,
+    "ast_hash": "62f56627ad116b35df78679d6989bb1f",
+    "semantic_hash": "62f56627ad116b35df78679d6989bb1f"
+  },
+  ".agent/skills/cycle-math.md": {
+    "mtime": 1793237523.66051,
+    "seen": 1793259222.580205,
+    "ast_hash": "cf2540e8cee60e271f5860fc65fd37dd",
+    "semantic_hash": "cf2540e8cee60e271f5860fc65fd37dd"
+  },
+  ".agent/skills/db-schema.md": {
+    "mtime": 1793242027.4028506,
+    "seen": 1793259222.580205,
+    "ast_hash": "044ffe923b6785860bde465d600a9e55",
+    "semantic_hash": "044ffe923b6785860bde465d600a9e55"
+  },
+  ".agents/skills/mobile-app-ui-design/INDEX.md": {
+    "mtime": 1793237417.1593857,
+    "seen": 1793259222.580205,
+    "ast_hash": "fca96b82ef89775353578658b488e162",
+    "semantic_hash": "fca96b82ef89775353578658b488e162"
+  },
+  ".agents/skills/mobile-app-ui-design/README.md": {
+    "mtime": 1793237417.1623926,
+    "seen": 1793259222.580205,
+    "ast_hash": "6ef41a1b84873c5d24bb374cffe82244",
+    "semantic_hash": "6ef41a1b84873c5d24bb374cffe82244"
+  },
+  ".agents/skills/mobile-app-ui-design/SKILL.md": {
+    "mtime": 1793237417.1664224,
+    "seen": 1793259222.580205,
+    "ast_hash": "7353d6fc541efac41aa7af659c8512c9",
+    "semantic_hash": "7353d6fc541efac41aa7af659c8512c9"
+  },
+  ".agents/skills/mobile-app-ui-design/references/industry-conventions.md": {
+    "mtime": 1793237417.1694312,
+    "seen": 1793259222.580205,
+    "ast_hash": "77344e697dab9314519450472c1d2855",
+    "semantic_hash": "77344e697dab9314519450472c1d2855"
+  },
+  ".github/copilot-instructions.md": {
+    "mtime": 1793237523.654986,
+    "seen": 1793259222.580205,
+    "ast_hash": "05f562d1b296c03c54ee43214091b6ca",
+    "semantic_hash": "05f562d1b296c03c54ee43214091b6ca"
+  },
+  "PRD.md": {
+    "mtime": 1793240335.407922,
+    "seen": 1793259222.580205,
+    "ast_hash": "2105b167dea0cd88b3e5493b6299b42c",
+    "semantic_hash": "2105b167dea0cd88b3e5493b6299b42c"
+  },
+  "README.md": {
+    "mtime": 1793261096.6322565,
+    "seen": 1793261496.8086712,
+    "ast_hash": "7c4faa1468155b4ba3d00788c90b1c3f",
+    "semantic_hash": ""
+  },
+  "public/icon_talaqids.png": {
+    "mtime": 1793257700.8574252,
+    "seen": 1793259222.580205,
+    "ast_hash": "e7271be5222bfa677b7ae66fc9fa24b8",
+    "semantic_hash": "e7271be5222bfa677b7ae66fc9fa24b8"
+  },
+  "public/logo_talaqids.png": {
+    "mtime": 1793257698.4156194,
+    "seen": 1793259222.580205,
+    "ast_hash": "4f88af928e9cce66c6304dc811da7e3a",
+    "semantic_hash": "4f88af928e9cce66c6304dc811da7e3a"
+  },
+  "src/components/NowPlayingBar.tsx": {
+    "mtime": 1793260432.6348002,
+    "seen": 1793261496.8086712,
+    "ast_hash": "7f6c604cdca360701f223bafd3247185",
+    "semantic_hash": ""
+  },
+  "src/components/NowPlayingSheet.tsx": {
+    "mtime": 1793260491.3188932,
+    "seen": 1793261496.8086712,
+    "ast_hash": "a62d2b651849af8a580758633fe9da22",
+    "semantic_hash": ""
+  },
+  "src/hooks/useAyahText.ts": {
+    "mtime": 1793260407.9461217,
+    "seen": 1793261496.8086712,
+    "ast_hash": "58fefcca0dc3fd73e5bf9e3e550f1a55",
+    "semantic_hash": ""
+  },
+  "public/icons/apple-touch-icon.png": {
+    "mtime": 1793259217.8278265,
+    "seen": 1793261496.8086712,
+    "ast_hash": "ecc9862b39f703fec1f331fb3d0297a8",
+    "semantic_hash": ""
+  },
+  "public/icons/favicon-32.png": {
+    "mtime": 1793259217.8890176,
+    "seen": 1793261496.8086712,
+    "ast_hash": "5669ac8e9a22fe89e93976c419b7a6a9",
+    "semantic_hash": ""
+  },
+  "public/icons/icon-192.png": {
+    "mtime": 1793259217.4721358,
+    "seen": 1793261496.8086712,
+    "ast_hash": "ed765c8b88ea71d5f2decd2b54c93c32",
+    "semantic_hash": ""
+  },
+  "public/icons/icon-512.png": {
+    "mtime": 1793259217.5806155,
+    "seen": 1793261496.8086712,
+    "ast_hash": "eac1f29ecd366977d61547e673f2360a",
+    "semantic_hash": ""
+  },
+  "public/icons/icon-maskable-192.png": {
+    "mtime": 1793259217.651348,
+    "seen": 1793261496.8086712,
+    "ast_hash": "b6ddf0baf1edbd0866da8a7f1acb870b",
+    "semantic_hash": ""
+  },
+  "public/icons/icon-maskable-512.png": {
+    "mtime": 1793259217.7432418,
+    "seen": 1793261496.8086712,
+    "ast_hash": "b397110d0addc5ff8e59d3cdcd7a65b0",
+    "semantic_hash": ""
+  },
+  "public/logo-wordmark.png": {
+    "mtime": 1793259295.4036071,
+    "seen": 1793261496.8086712,
+    "ast_hash": "bf77193e9431c39c29c0dfea1a96054c",
+    "semantic_hash": ""
+  }
+}

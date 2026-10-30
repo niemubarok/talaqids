@@ -347,7 +347,7 @@ export default function HomePage() {
       </header>
 
       {/* Main Content Container (Mobile-First Fluid Max-Width) */}
-      <main className="relative z-10 mx-auto w-full max-w-lg flex-1 px-4 pb-44 pt-3">
+      <main className="relative z-10 mx-auto w-full max-w-lg flex-1 px-4 pb-36 pt-3">
         <PwaInstallBanner />
         {activeChild && cycle && (
           <>
@@ -410,38 +410,45 @@ export default function HomePage() {
         />
       )}
 
-      {/* Floating dock: mini player + bottom navigation */}
+      {/* Unified Floating Dock: mini player + bottom navigation in one cohesive capsule */}
       {activeChild && (
-        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 mx-auto flex w-full max-w-lg flex-col gap-2 px-3 pb-[max(0.65rem,env(safe-area-inset-bottom))]">
-          <NowPlayingBar isPro={settings.isProUser} onExpand={() => setIsPlayerOpen(true)} />
+        <div
+          className={`pointer-events-none fixed inset-x-0 bottom-0 z-40 mx-auto w-full max-w-lg px-3 pb-[max(0.65rem,env(safe-area-inset-bottom))] transition-all duration-300 ease-out ${
+            isPlayerOpen ? 'translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'
+          }`}
+          aria-hidden={isPlayerOpen}
+        >
+          <div className="pointer-events-auto overflow-hidden rounded-[26px] border border-[#1E4C40]/12 bg-[#FFFCF5]/95 shadow-[0_24px_50px_-20px_rgba(16,46,39,0.5)] backdrop-blur-xl">
+            <NowPlayingBar isPro={settings.isProUser} onExpand={() => setIsPlayerOpen(true)} />
 
-          <nav
-            aria-label="Navigasi utama"
-            className="pointer-events-auto rounded-[24px] border border-[#1E4C40]/10 bg-[#FFFCF5]/95 p-1.5 shadow-[0_28px_60px_-32px_rgba(16,46,39,0.55)] backdrop-blur-xl"
-          >
-            <div className="grid grid-cols-3 gap-1">
-              {NAV_ITEMS.map((item) => {
-                const isActive = activeTab === item.id;
-                const Icon = item.icon;
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => setActiveTab(item.id)}
-                    aria-current={isActive ? 'page' : undefined}
-                    className={`flex min-h-[52px] flex-col items-center justify-center gap-1 rounded-[18px] transition ${
-                      isActive
-                        ? 'bg-[#1E4C40] text-[#F3E7CB] shadow-[0_14px_28px_-16px_rgba(16,46,39,0.9)]'
-                        : 'text-[#6B7A72] hover:bg-[#1E4C40]/5'
-                    }`}
-                  >
-                    <Icon className="h-[18px] w-[18px]" />
-                    <span className="text-[10px] font-bold tracking-wide">{item.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </nav>
+            <nav
+              aria-label="Navigasi utama"
+              className="border-t border-[#1E4C40]/8 p-1"
+            >
+              <div className="grid grid-cols-3 gap-1">
+                {NAV_ITEMS.map((item) => {
+                  const isActive = activeTab === item.id;
+                  const Icon = item.icon;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => setActiveTab(item.id)}
+                      aria-current={isActive ? 'page' : undefined}
+                      className={`flex min-h-[46px] flex-col items-center justify-center gap-0.5 rounded-[18px] transition ${
+                        isActive
+                          ? 'bg-[#1E4C40] text-[#F3E7CB] shadow-[0_10px_20px_-10px_rgba(16,46,39,0.8)]'
+                          : 'text-[#6B7A72] hover:bg-[#1E4C40]/5'
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span className="text-[9.5px] font-bold tracking-wide">{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </nav>
+          </div>
         </div>
       )}
 

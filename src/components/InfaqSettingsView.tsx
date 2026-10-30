@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import {
   Check,
   Cloud,
   HeartHandshake,
+  Info,
   Loader2,
   Lock,
   LogOut,
@@ -17,7 +19,11 @@ import {
   UserPlus,
   Volume2,
 } from 'lucide-react';
-import { RECITERS } from '@/lib/quran-metadata';
+import { Pencil } from 'lucide-react';
+import { EditChildModal } from '@/components/EditChildModal';
+import { updateChildProfile, deleteChildProfile } from '@/lib/db';
+import { RECITERS, type Reciter } from '@/lib/quran-metadata';
+import { ReciterProfileModal } from '@/components/ReciterProfileModal';
 import {
   activateMuhsininTier,
   db,
@@ -78,6 +84,8 @@ export function InfaqSettingsView({
   const [selectedNominal, setSelectedNominal] = useState(75000);
   const [prayerBanner, setPrayerBanner] = useState(false);
   const [cacheClearedMsg, setCacheClearedMsg] = useState<string | null>(null);
+  const [selectedProfileReciter, setSelectedProfileReciter] = useState<Reciter | null>(null);
+  const [editingChild, setEditingChild] = useState<ChildProfile | null>(null);
 
   const handleHonorActivation = async () => {
     await activateMuhsininTier(selectedNominal);
@@ -116,6 +124,7 @@ export function InfaqSettingsView({
     <div className="space-y-4">
       {/* ── Muhsinin / Tier hero ────────────────────────────────────── */}
       <section
+        id="infaq-section"
         className={`rise relative overflow-hidden rounded-[30px] p-5 transition-colors ${
           settings.isProUser
             ? 'gold-gradient border border-[#C89B4E]/45 text-[#12211C] shadow-[0_32px_70px_-42px_rgba(156,115,48,0.65)]'
@@ -230,17 +239,19 @@ export function InfaqSettingsView({
           {childrenList.map((item) => {
             const isSelected = item.id === activeChild.id;
             return (
-              <button
+              <div
                 key={item.id}
-                type="button"
-                onClick={() => onSelectChild(item.id)}
-                className={`flex w-full items-center justify-between gap-2 rounded-2xl border p-2.5 text-left transition ${
+                className={`flex w-full items-center justify-between gap-2 rounded-2xl border p-2.5 transition ${
                   isSelected
                     ? 'border-[#1E4C40]/30 bg-[#1E4C40]/5'
                     : 'border-[#1E4C40]/8 bg-[#FBF6EC]/60 hover:bg-[#F6F0E4]'
                 }`}
               >
-                <div className="flex min-w-0 items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => onSelectChild(item.id)}
+                  className="flex min-w-0 flex-1 items-center gap-2.5 text-left"
+                >
                   <span
                     className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[12px] font-extrabold ${
                       isSelected
@@ -256,13 +267,24 @@ export function InfaqSettingsView({
                     </p>
                     <p className="text-[10px] text-[#8A968F]">Lahir {item.birthDate}</p>
                   </div>
+                </button>
+
+                <div className="flex shrink-0 items-center gap-1.5">
+                  {isSelected && (
+                    <span className="rounded-full bg-[#1E4C40]/10 px-2 py-0.5 text-[9px] font-extrabold text-[#1E4C40]">
+                      Aktif
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setEditingChild(item)}
+                    title={`Edit profil ${item.name}`}
+                    className="flex h-7 w-7 items-center justify-center rounded-full bg-[#1E4C40]/8 text-[#1E4C40] transition hover:bg-[#1E4C40]/15"
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </button>
                 </div>
-                {isSelected && (
-                  <span className="rounded-full bg-[#1E4C40]/10 px-2 py-0.5 text-[9px] font-extrabold text-[#1E4C40]">
-                    Aktif
-                  </span>
-                )}
-              </button>
+              </div>
             );
           })}
         </div>
@@ -270,54 +292,102 @@ export function InfaqSettingsView({
 
       {/* ── Reciters ────────────────────────────────────────────────── */}
       <section className="surface rise p-4 [animation-delay:90ms]">
-        <div className="flex items-center gap-2">
-          <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-[#1E4C40]/8 text-[#1E4C40]">
-            <Volume2 className="h-3.5 w-3.5" />
-          </span>
-          <div>
-            <p className="text-[9px] font-extrabold uppercase tracking-[0.22em] text-[#8A968F]">
-              Qari
-            </p>
-            <h3 className="text-[13px] font-extrabold text-[#15231E]">Pilihan murottal</h3>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-[#1E4C40]/8 text-[#1E4C40]">
+              <Volume2 className="h-3.5 w-3.5" />
+            </span>
+            <div>
+              <p className="text-[9px] font-extrabold uppercase tracking-[0.22em] text-[#8A968F]">
+                Qari Murottal
+              </p>
+              <h3 className="text-[13px] font-extrabold text-[#15231E]">Pilihan murottal talaqqi</h3>
+            </div>
           </div>
+          <span className="text-[10px] font-semibold text-[#8A968F]">
+            Ketuk &apos;Profil&apos; untuk biografi
+          </span>
         </div>
 
-        <div className="mt-3 space-y-1.5">
+        <div className="mt-3 space-y-2">
           {RECITERS.map((reciter) => {
             const isSelected = activeChild.preferredReciterId === reciter.id;
             const locked = reciter.isPro && !settings.isProUser;
             return (
-              <button
+              <div
                 key={reciter.id}
-                type="button"
-                onClick={() => void handleSelectReciter(reciter.id, reciter.isPro)}
-                disabled={locked}
-                className={`flex w-full items-center justify-between gap-2 rounded-2xl border p-3 text-left transition ${
+                className={`group flex items-center justify-between gap-3 rounded-2xl border p-2.5 transition ${
                   isSelected
-                    ? 'border-[#C89B4E]/60 bg-[#C89B4E]/10'
+                    ? 'border-[#C89B4E]/70 bg-[#C89B4E]/10 ring-1 ring-[#C89B4E]/30'
                     : locked
-                      ? 'cursor-not-allowed border-[#1E4C40]/6 bg-[#FBF6EC]/60 opacity-55'
+                      ? 'border-[#1E4C40]/8 bg-[#FBF6EC]/60 opacity-70'
                       : 'border-[#1E4C40]/8 bg-[#FFFCF5] hover:bg-[#FBF6EC]'
                 }`}
               >
-                <div className="min-w-0">
-                  <p className="truncate text-[12px] font-extrabold text-[#15231E]">
-                    {reciter.name}
-                  </p>
-                  <p className="text-[10px] text-[#8A968F]">
-                    {reciter.style} · {reciter.bitrate}
-                  </p>
+                {/* Clickable selector part */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (locked) {
+                      setSelectedProfileReciter(reciter);
+                      return;
+                    }
+                    void handleSelectReciter(reciter.id, reciter.isPro);
+                  }}
+                  className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                >
+                  <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-[#1E4C40]/15 bg-[#15352C] shadow-xs">
+                    <Image
+                      src={reciter.photoUrl}
+                      alt={reciter.name}
+                      fill
+                      sizes="48px"
+                      className="object-cover object-top"
+                    />
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <p className="truncate text-[12px] font-extrabold text-[#15231E]">
+                        {reciter.name}
+                      </p>
+                    </div>
+                    <p className="truncate text-[10px] text-[#6B7A72]">
+                      {reciter.style} · {reciter.bitrate}
+                    </p>
+                    <p className="truncate text-[9px] font-semibold text-[#8A968F]">
+                      {reciter.origin} · {reciter.period}
+                    </p>
+                  </div>
+                </button>
+
+                {/* Actions & status */}
+                <div className="flex shrink-0 items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedProfileReciter(reciter)}
+                    title={`Lihat profil ${reciter.name}`}
+                    className="flex h-8 items-center gap-1 rounded-xl border border-[#1E4C40]/10 bg-white/90 px-2 text-[10px] font-bold text-[#1E4C40] transition hover:bg-[#1E4C40]/8 active:scale-95"
+                  >
+                    <Info className="h-3.5 w-3.5 text-[#2F6B5B]" />
+                    <span>Profil</span>
+                  </button>
+
+                  {isSelected ? (
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#1E4C40] text-[#F3E7CB]">
+                      <Check className="h-4 w-4" />
+                    </span>
+                  ) : locked ? (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedProfileReciter(reciter)}
+                      className="shrink-0 rounded-full bg-[#C89B4E]/15 px-2 py-0.5 text-[9px] font-extrabold text-[#9C7330]"
+                    >
+                      Muhsinin
+                    </button>
+                  ) : null}
                 </div>
-                {isSelected ? (
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#1E4C40] text-[#F3E7CB]">
-                    <Check className="h-3.5 w-3.5" />
-                  </span>
-                ) : locked ? (
-                  <span className="shrink-0 rounded-full bg-[#C89B4E]/15 px-2 py-0.5 text-[9px] font-extrabold text-[#9C7330]">
-                    Muhsinin
-                  </span>
-                ) : null}
-              </button>
+              </div>
             );
           })}
         </div>
@@ -543,6 +613,34 @@ export function InfaqSettingsView({
           </p>
         )}
       </section>
+
+      {/* ── Reciter Profile Modal ────────────────────────────────────── */}
+      <ReciterProfileModal
+        reciter={selectedProfileReciter}
+        activeReciterId={activeChild.preferredReciterId}
+        isProUser={settings.isProUser}
+        onClose={() => setSelectedProfileReciter(null)}
+        onSelectReciter={(r) => void handleSelectReciter(r.id, r.isPro)}
+        onUnlockRequest={() => {
+          const el = document.getElementById('infaq-section');
+          el?.scrollIntoView({ behavior: 'smooth' });
+        }}
+      />
+
+      {/* ── Edit Child Modal ─────────────────────────────────────────── */}
+      {editingChild && (
+        <EditChildModal
+          child={editingChild}
+          canDelete={childrenList.length > 1}
+          onSave={async (updated) => {
+            await updateChildProfile(editingChild.id, updated);
+          }}
+          onDelete={async () => {
+            await deleteChildProfile(editingChild.id);
+          }}
+          onClose={() => setEditingChild(null)}
+        />
+      )}
     </div>
   );
 }

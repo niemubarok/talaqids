@@ -123,6 +123,64 @@ export async function createChildProfile(input: {
   return profile;
 }
 
+export async function updateChildProfile(
+  childId: string,
+  input: {
+    name: string;
+    birthDate: string;
+    startDate?: string;
+    preferredReciterId?: string;
+    manualJuzOverride?: number | null;
+  }
+): Promise<ChildProfile | null> {
+  const existing = await db.children.get(childId);
+  if (!existing) return null;
+
+  const nowIso = new Date().toISOString();
+  const updated: ChildProfile = {
+    ...existing,
+    name: input.name.trim(),
+    birthDate: input.birthDate,
+    startDate: input.startDate || existing.startDate,
+    preferredReciterId: input.preferredReciterId || existing.preferredReciterId,
+    manualJuzOverride:
+      input.manualJuzOverride !== undefined
+        ? input.manualJuzOverride
+        : existing.manualJuzOverride,
+    updatedAt: nowIso,
+  };
+
+  await db.children.put(updated);
+  notifyLocalDataMutated();
+  return updated;
+}
+
+export async function deleteChildProfile(childId: string): Promise<boolean> {
+  return await db.transaction('rw', db.children, db.progress, db.settings, async () => {
+    const existing = await db.children.get(childId);
+    if (!existing) return false;
+
+    // Delete child profile
+    await db.children.delete(childId);
+
+    // Delete related progress data
+    await db.progress.where('childId').equals(childId).delete();
+
+    // Reassign activeChildId if the deleted child was currently active
+    const settings = (await db.settings.get('app_config')) || DEFAULT_APP_SETTINGS;
+    if (settings.activeChildId === childId) {
+      const remainingChildren = await db.children.toArray();
+      await db.settings.put({
+        ...settings,
+        activeChildId: remainingChildren[0]?.id || undefined,
+      });
+    }
+
+    notifyLocalDataMutated();
+    return true;
+  });
+}
+
 export async function togglePageCompleted(params: {
   childId: string;
   juzNumber: number;

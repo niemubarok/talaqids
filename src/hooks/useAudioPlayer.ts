@@ -583,6 +583,11 @@ class AudioEngineSingleton {
       album: `talaQids — Siklus Bulan Ke-${this.state.currentCycleMonth}`,
       artwork: [
         {
+          src: reciter.photoUrl,
+          sizes: '300x300',
+          type: 'image/jpeg',
+        },
+        {
           src: '/icons/icon-512.png',
           sizes: '512x512',
           type: 'image/png',
