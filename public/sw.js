@@ -31,6 +31,9 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET') return;
 
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+
   // App shell: network-first so redesigns ship immediately, with offline fallback.
   if (request.mode === 'navigate') {
     event.respondWith(

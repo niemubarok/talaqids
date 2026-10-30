@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { BookOpen, ChevronDown, Cloud, LayoutDashboard, RefreshCw, Sparkles } from 'lucide-react';
+import { BookOpen, ChevronDown, Cloud, LayoutDashboard, Lock, RefreshCw, Sparkles } from 'lucide-react';
 import {
   db,
   DEFAULT_APP_SETTINGS,
@@ -44,6 +44,7 @@ export default function HomePage() {
   const [cloudError, setCloudError] = useState<string | null>(null);
   const [, setRelativeTimeTick] = useState(0);
   const syncingRef = useRef(false);
+  const lastSyncFinishedAtRef = useRef(0);
   const configureSession = useAudioSessionConfig();
 
   // Register PWA Service Worker
@@ -130,6 +131,12 @@ export default function HomePage() {
   };
 
   const triggerCloudSync = useCallback(async (interactive: boolean) => {
+    if (!settings.isProUser) {
+      if (interactive) {
+        setActiveTab('infaq');
+      }
+      return;
+    }
     if (syncingRef.current) return;
     syncingRef.current = true;
     setIsSyncingCloud(true);
@@ -145,10 +152,11 @@ export default function HomePage() {
         setCloudError(msg);
       }
     } finally {
+      lastSyncFinishedAtRef.current = Date.now();
       syncingRef.current = false;
       setIsSyncingCloud(false);
     }
-  }, []);
+  }, [settings.isProUser]);
 
   // Refresh "Terakhir sinkron: X menit lalu" label every 30s
   useEffect(() => {
@@ -164,13 +172,14 @@ export default function HomePage() {
   // 3. Debounced push after local IndexedDB mutations
   useEffect(() => {
     const canSilentSync = () =>
-      Boolean(getConfiguredGoogleClientId() && getStoredAccessToken());
+      Boolean(settings.isProUser && getConfiguredGoogleClientId() && getStoredAccessToken());
 
     if (canSilentSync()) {
       void triggerCloudSync(false);
     }
 
     const handleVisibilityOrFocus = () => {
+      if (Date.now() - lastSyncFinishedAtRef.current < 15_000) return;
       if (document.visibilityState === 'visible' && canSilentSync()) {
         void triggerCloudSync(false);
       }
@@ -202,7 +211,7 @@ export default function HomePage() {
       window.clearInterval(pollInterval);
       if (debounceTimer) window.clearTimeout(debounceTimer);
     };
-  }, [settings, triggerCloudSync]);
+  }, [settings.isProUser, triggerCloudSync]);
 
   const isLoadingInitial = childrenList === undefined;
 
@@ -255,13 +264,21 @@ export default function HomePage() {
                 onClick={() => void triggerCloudSync(true)}
                 disabled={isSyncingCloud}
                 title={
-                  settings.googleDriveLastSyncedAt
-                    ? `Terakhir sinkron: ${formatRelativeSyncTime(settings.googleDriveLastSyncedAt)}`
-                    : 'Sinkronkan ke Google Drive (HP Ayah & Ibu)'
+                  !settings.isProUser
+                    ? 'Fitur sinkronisasi khusus Tier Muhsinin — klik untuk membuka'
+                    : settings.googleDriveLastSyncedAt
+                      ? `Terakhir sinkron: ${formatRelativeSyncTime(settings.googleDriveLastSyncedAt)}`
+                      : 'Sinkronkan ke Google Drive (HP Ayah & Ibu)'
                 }
-                className="flex min-h-[38px] shrink-0 items-center gap-1.5 rounded-full border border-[#1E4C40]/10 bg-[#FFFCF5]/90 px-2.5 py-1 text-left shadow-[0_10px_24px_-18px_rgba(16,46,39,0.8)] transition hover:border-[#2F6B5B]/40 active:scale-[0.99] disabled:opacity-65"
+                className={`flex min-h-[38px] shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-left shadow-[0_10px_24px_-18px_rgba(16,46,39,0.8)] transition active:scale-[0.99] disabled:opacity-65 ${
+                  settings.isProUser
+                    ? 'border-[#1E4C40]/10 bg-[#FFFCF5]/90 hover:border-[#2F6B5B]/40'
+                    : 'border-[#C89B4E]/30 bg-[#FBF6EC]/80 opacity-80 hover:border-[#C89B4E]/50'
+                }`}
               >
-                {isSyncingCloud ? (
+                {!settings.isProUser ? (
+                  <Lock className="h-3.5 w-3.5 shrink-0 text-[#9C7330]" />
+                ) : isSyncingCloud ? (
                   <RefreshCw className="h-3.5 w-3.5 shrink-0 animate-spin text-[#1E4C40]" />
                 ) : (
                   <Cloud
@@ -272,12 +289,18 @@ export default function HomePage() {
                 )}
                 <div className="leading-tight">
                   <p className="text-[9.5px] font-extrabold text-[#15231E]">Sinkronkan</p>
-                  <p className="text-[8px] font-semibold text-[#6B7A72]">
-                    {isSyncingCloud
-                      ? 'Menyinkronkan...'
-                      : settings.googleDriveLastSyncedAt
-                        ? formatRelativeSyncTime(settings.googleDriveLastSyncedAt)
-                        : 'Google Drive'}
+                  <p
+                    className={`text-[8px] font-semibold ${
+                      !settings.isProUser ? 'font-extrabold text-[#9C7330]' : 'text-[#6B7A72]'
+                    }`}
+                  >
+                    {!settings.isProUser
+                      ? 'Muhsinin'
+                      : isSyncingCloud
+                        ? 'Menyinkronkan...'
+                        : settings.googleDriveLastSyncedAt
+                          ? formatRelativeSyncTime(settings.googleDriveLastSyncedAt)
+                          : 'Google Drive'}
                   </p>
                 </div>
               </button>

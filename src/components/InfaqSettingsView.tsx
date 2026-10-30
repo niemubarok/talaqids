@@ -6,6 +6,7 @@ import {
   Cloud,
   HeartHandshake,
   Loader2,
+  Lock,
   LogOut,
   MessageCircle,
   QrCode,
@@ -105,7 +106,7 @@ export function InfaqSettingsView({
     );
   };
 
-  const whatsappUrl = `https://wa.me/6281234567890?text=${encodeURIComponent(
+  const whatsappUrl = `https://wa.me/6285524914191?text=${encodeURIComponent(
     `Assalamu'alaikum Admin talaQids, saya telah berinfaq sebesar Rp${selectedNominal.toLocaleString(
       'id-ID'
     )} untuk mendukung dakwah aplikasi talaQids (Anak: ${activeChild.name}). Mohon doa keberkahannya.`
@@ -163,7 +164,7 @@ export function InfaqSettingsView({
 
         <div className="relative mt-4 flex flex-wrap gap-1.5">
           {(settings.isProUser
-            ? ['30 Juz terbuka', 'Tanpa iklan', 'Audio offline aktif']
+            ? ['30 Juz terbuka', 'Tanpa iklan', 'Audio offline aktif', 'Sinkronisasi Cloud']
             : ['30 Juz terbuka', 'Tanpa iklan', 'Streaming online']
           ).map((item) => (
             <span
@@ -420,50 +421,77 @@ export function InfaqSettingsView({
       <section className="surface rise space-y-3.5 p-4 [animation-delay:150ms]">
         <div className="flex items-start justify-between gap-3">
           <div>
-           
-            <h3 className="mt-0.5 text-[14px] font-extrabold text-[#15231E]">
-              Sinkronisasi HP Ayah &amp; Bunda
-            </h3>
+            <div className="flex items-center gap-2">
+              <h3 className="mt-0.5 text-[14px] font-extrabold text-[#15231E]">
+                Sinkronisasi HP Ayah &amp; Bunda
+              </h3>
+              {!settings.isProUser && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#C89B4E]/15 px-2 py-0.5 text-[9px] font-extrabold text-[#9C7330]">
+                  <Lock className="h-2.5 w-2.5" />
+                  Muhsinin
+                </span>
+              )}
+            </div>
             <p className="mt-0.5 text-[10px] leading-relaxed text-[#6B7A72]">
               Data disimpan di folder tersembunyi Google Drive pribadi Anda (<code className="font-mono text-[9.5px] text-[#1E4C40]">talaqids_data.json</code>). Privasi terjaga 100%.
             </p>
           </div>
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-[#1E4C40]/10 text-[#1E4C40]">
-            <Cloud className="h-4 w-4" />
+            {settings.isProUser ? <Cloud className="h-4 w-4" /> : <Lock className="h-4 w-4 text-[#9C7330]" />}
           </span>
         </div>
 
-        <div className="rounded-2xl bg-[#F6F0E4]/80 p-3 ring-1 ring-[#1E4C40]/8">
+        <div
+          className={`rounded-2xl p-3 ring-1 ${
+            settings.isProUser
+              ? 'bg-[#F6F0E4]/80 ring-[#1E4C40]/8'
+              : 'bg-[#FBF6EC]/60 opacity-75 ring-[#C89B4E]/20'
+          }`}
+        >
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="min-w-0">
               <p className="text-[10px] font-extrabold text-[#15231E]">
-                {settings.googleDriveEmail
-                  ? `Terhubung: ${settings.googleDriveEmail}`
-                  : settings.googleDriveLastSyncedAt
-                    ? 'Terhubung ke Google Drive'
-                    : 'Belum terhubung ke Google Drive'}
+                {!settings.isProUser
+                  ? 'Fitur Terkunci (Khusus Tier Muhsinin)'
+                  : settings.googleDriveEmail
+                    ? `Terhubung: ${settings.googleDriveEmail}`
+                    : settings.googleDriveLastSyncedAt
+                      ? 'Terhubung ke Google Drive'
+                      : 'Belum terhubung ke Google Drive'}
               </p>
               <p className="mt-0.5 text-[9.5px] font-semibold text-[#6B7A72]">
-                Terakhir sinkron: {formatRelativeSyncTime(settings.googleDriveLastSyncedAt)}
+                {!settings.isProUser
+                  ? 'Aktifkan Tier Muhsinin di atas untuk sinkronisasi otomatis antar perangkat'
+                  : `Terakhir sinkron: ${formatRelativeSyncTime(settings.googleDriveLastSyncedAt)}`}
               </p>
             </div>
 
             <div className="flex items-center gap-1.5">
               <button
                 type="button"
-                disabled={isSyncingCloud}
+                disabled={!settings.isProUser || isSyncingCloud}
                 onClick={() => void onManualSyncCloud?.()}
-                className="flex items-center gap-1.5 rounded-full bg-[#1E4C40] px-3 py-1.5 text-[10px] font-extrabold text-[#F3E7CB] shadow-sm transition hover:bg-[#163a31] active:scale-95 disabled:opacity-60"
+                className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[10px] font-extrabold shadow-sm transition ${
+                  settings.isProUser
+                    ? 'bg-[#1E4C40] text-[#F3E7CB] hover:bg-[#163a31] active:scale-95 disabled:opacity-60'
+                    : 'cursor-not-allowed bg-[#C89B4E]/20 text-[#9C7330]'
+                }`}
               >
-                {isSyncingCloud ? (
+                {!settings.isProUser ? (
+                  <Lock className="h-3 w-3" />
+                ) : isSyncingCloud ? (
                   <Loader2 className="h-3 w-3 animate-spin" />
                 ) : (
                   <RefreshCw className="h-3 w-3" />
                 )}
-                {settings.googleDriveLastSyncedAt ? 'Sinkronkan' : 'Hubungkan Google Drive'}
+                {!settings.isProUser
+                  ? 'Terkunci'
+                  : settings.googleDriveLastSyncedAt
+                    ? 'Sinkronkan'
+                    : 'Hubungkan Google Drive'}
               </button>
 
-              {(settings.googleDriveEmail || settings.googleDriveLastSyncedAt) && (
+              {settings.isProUser && (settings.googleDriveEmail || settings.googleDriveLastSyncedAt) && (
                 <button
                   type="button"
                   onClick={() => void handleDisconnectDrive()}

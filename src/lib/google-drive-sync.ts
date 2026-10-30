@@ -498,6 +498,9 @@ export async function syncWithGoogleDrive(options?: {
   interactive?: boolean;
 }): Promise<{ syncedAt: string; email?: string; fileId: string }> {
   const settings = await ensureAppSettings();
+  if (!settings.isProUser) {
+    throw new Error('Fitur sinkronisasi Google Drive khusus untuk Tier Muhsinin.');
+  }
   const clientId = getConfiguredGoogleClientId();
 
   if (!clientId) {

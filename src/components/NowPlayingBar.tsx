@@ -23,6 +23,7 @@ export function NowPlayingBar({ isPro = false, onExpand }: NowPlayingBarProps) {
     state.duration > 0 ? Math.min(100, (state.currentTime / state.duration) * 100) : 0;
 
   const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if ((event.target as HTMLElement).closest('button')) return;
     startY.current = event.clientY;
     moved.current = false;
     setIsDragging(true);
@@ -45,7 +46,8 @@ export function NowPlayingBar({ isPro = false, onExpand }: NowPlayingBarProps) {
     setIsDragging(false);
   };
 
-  const handleActivate = () => {
+  const handleActivate = (event: React.MouseEvent<HTMLDivElement>) => {
+    if ((event.target as HTMLElement).closest('button')) return;
     if (moved.current) return;
     onExpand();
   };
@@ -117,6 +119,7 @@ export function NowPlayingBar({ isPro = false, onExpand }: NowPlayingBarProps) {
 
         <button
           type="button"
+          onPointerDown={(event) => event.stopPropagation()}
           onClick={(event) => {
             event.stopPropagation();
             void togglePlay();
@@ -135,6 +138,7 @@ export function NowPlayingBar({ isPro = false, onExpand }: NowPlayingBarProps) {
 
         <button
           type="button"
+          onPointerDown={(event) => event.stopPropagation()}
           onClick={(event) => {
             event.stopPropagation();
             void nextTrack();
