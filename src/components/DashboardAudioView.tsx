@@ -13,6 +13,7 @@ import {
   Pause,
   Play,
   Repeat,
+  Shield,
   Sliders,
   Sparkles,
   Users,
@@ -96,10 +97,15 @@ export function DashboardAudioView({
             <span className="h-1.5 w-1.5 rounded-full bg-[#EAD8AF]" />
             Bulan {cycle.currentMonth} · Hari {cycle.dayInCurrentCycle}/30
           </div>
-          {isPro && (
+          {isPro ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-[#C89B4E]/25 px-2.5 py-1 text-[9px] font-extrabold uppercase tracking-[0.16em] text-[#F0DDB4] ring-1 ring-[#EAD8AF]/30">
               <Crown className="h-2.5 w-2.5 text-[#EAD8AF]" />
               Muhsinin
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.14em] text-white/75 ring-1 ring-white/15">
+              <Shield className="h-2.5 w-2.5 text-[#EAD8AF]" />
+              Free Tier
             </span>
           )}
         </div>

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Check, Copy, Crown, HeartHandshake, Landmark, MessageCircle, QrCode, Sparkles, X } from 'lucide-react';
+import { Check, Copy, Crown, HeartHandshake, Landmark, MessageCircle, QrCode, Shield, Sparkles, X } from 'lucide-react';
 import { activateMuhsininTier } from '@/lib/db';
 
 interface InfaqModalProps {
@@ -165,7 +165,7 @@ export function InfaqModal({
         <div className="flex items-center justify-between border-b border-[#1E4C40]/8 px-5 py-4">
           <div className="flex items-center gap-2.5">
             <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-[#C89B4E]/15 text-[#8A6220]">
-              <Crown className="h-4 w-4" />
+              <HeartHandshake className="h-4 w-4" />
             </span>
             <div>
               <h2 id="infaq-modal-title" className="text-[15px] font-extrabold text-[#15231E]">
@@ -201,7 +201,11 @@ export function InfaqModal({
                   isProUser ? 'bg-[#1E4C40] text-[#F3E7CB]' : 'bg-[#EAD8AF] text-[#15231E]'
                 }`}
               >
-                <Crown className="h-3 w-3" />
+                {isProUser ? (
+                  <Crown className="h-3 w-3 text-[#EAD8AF]" />
+                ) : (
+                  <Shield className="h-3 w-3 text-[#1E4C40]" />
+                )}
                 {isProUser ? 'Tier Muhsinin Aktif' : 'Free Tier'}
               </span>
             </div>

@@ -7,9 +7,11 @@ import {
   ChevronRight,
   Compass,
   Crown,
+  HeartHandshake,
   Info,
   Lock,
   Plus,
+  Shield,
   Sparkles,
   Trash2,
   Users,
@@ -213,12 +215,22 @@ export function ProfileDropdown({
         >
           <div className="flex items-center gap-2.5">
             <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#C89B4E]/15 text-[#8A6220]">
-              <Crown className="h-3.5 w-3.5" />
+              <HeartHandshake className="h-3.5 w-3.5" />
             </span>
             <div>
               <p className="text-[11.5px] font-extrabold text-[#15231E]">Infaq &amp; Muhsinin</p>
-              <p className="text-[9px] text-[#8A6220]">
-                {isProUser ? 'Tier Muhsinin Aktif' : 'Buka 30 Juz & dukung server'}
+              <p className="flex items-center gap-1 text-[9px] text-[#8A6220]">
+                {isProUser ? (
+                  <>
+                    <Crown className="h-2.5 w-2.5 text-[#8A6220]" />
+                    <span>Tier Muhsinin Aktif</span>
+                  </>
+                ) : (
+                  <>
+                    <Shield className="h-2.5 w-2.5 text-[#8A6220]" />
+                    <span>Free Tier · Buka 30 Juz</span>
+                  </>
+                )}
               </p>
             </div>
           </div>

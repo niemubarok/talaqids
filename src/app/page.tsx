@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { BookOpen, ChevronDown, Crown, LayoutDashboard, Lock, Menu, RefreshCw, Sparkles } from 'lucide-react';
+import { BookOpen, ChevronDown, HeartHandshake, LayoutDashboard, Lock, Menu, RefreshCw, Sparkles } from 'lucide-react';
 import {
   db,
   DEFAULT_APP_SETTINGS,
@@ -379,20 +379,16 @@ export default function HomePage() {
                 title={
                   settings.isProUser
                     ? 'Status Muhsinin Aktif • Barakallahu fiikum'
-                    : 'Tier Muhsinin & Infaq'
+                    : 'Infaq & Dukung talaQids'
                 }
-                aria-label="Tier Muhsinin & Infaq"
+                aria-label="Infaq & Muhsinin"
                 className={`relative flex h-9 w-9 shrink-0 items-center justify-center transition active:scale-90 ${
                   settings.isProUser
                     ? 'text-[#C89B4E] hover:text-[#8A6220]'
                     : 'text-[#1E4C40] hover:text-[#C89B4E]'
                 }`}
               >
-                <Crown
-                  className={`h-[22px] w-[22px] shrink-0 stroke-[2.2] ${
-                    settings.isProUser ? 'fill-[#C89B4E]/30 text-[#C89B4E]' : ''
-                  }`}
-                />
+                <HeartHandshake className="h-[22px] w-[22px] shrink-0 stroke-[2.2]" />
                 {settings.isProUser && (
                   <span className="absolute bottom-0.5 right-0.5 h-2 w-2 rounded-full bg-[#C89B4E] ring-1.5 ring-[#F6F0E4]" />
                 )}

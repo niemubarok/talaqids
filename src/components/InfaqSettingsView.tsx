@@ -15,6 +15,7 @@ import {
   MessageCircle,
   QrCode,
   RefreshCw,
+  Shield,
   ShieldCheck,
   Sparkles,
   Trash2,
@@ -154,9 +155,11 @@ export function InfaqSettingsView({
               : 'bg-[#EAD8AF] text-[#15231E]'
           }`}
         >
-          <Crown
-            className={`h-3 w-3 ${settings.isProUser ? 'text-[#EAD8AF]' : 'text-[#1E4C40]'}`}
-          />
+          {settings.isProUser ? (
+            <Crown className="h-3 w-3 text-[#EAD8AF]" />
+          ) : (
+            <Shield className="h-3 w-3 text-[#1E4C40]" />
+          )}
           {settings.isProUser ? 'Tier Muhsinin Aktif' : 'Free Tier'}
         </div>
 
@@ -234,10 +237,18 @@ export function InfaqSettingsView({
           )}
         </div>
 
-        <p className="mt-1 text-[10px] text-[#8A968F]">
-          {settings.isProUser
-            ? `Tier Muhsinin · ${childrenList.length}/5 profil`
-            : 'Free tier · maksimal 1 profil anak'}
+        <p className="mt-1 flex items-center gap-1.5 text-[10px] text-[#8A968F]">
+          {settings.isProUser ? (
+            <>
+              <Crown className="h-3 w-3 text-[#C89B4E]" />
+              <span>Tier Muhsinin · {childrenList.length}/5 profil</span>
+            </>
+          ) : (
+            <>
+              <Shield className="h-3 w-3 text-[#8A968F]" />
+              <span>Free tier · maksimal 1 profil anak</span>
+            </>
+          )}
         </p>
 
         <div className="mt-3 space-y-1.5">
