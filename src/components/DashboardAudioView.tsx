@@ -8,6 +8,7 @@ import {
   BookOpen,
   Calendar,
   CheckCircle2,
+  Crown,
   Headphones,
   Pause,
   Play,
@@ -62,7 +63,7 @@ export function DashboardAudioView({
   const nextJuz = (cycle.currentJuz % 30) + 1;
   const pagesDone = progressToday?.pagesCompleted.length || 0;
   const listenToday = Math.round(progressToday?.listenMinutes || 0);
-  const dailyTargetMinutes = 45;
+  const dailyTargetMinutes = 60;
   const listenTodayPct = Math.min(100, Math.round((listenToday / dailyTargetMinutes) * 100));
   const reciter = RECITERS.find((item) => item.id === state.reciterId) ?? RECITERS[0];
 
@@ -96,7 +97,8 @@ export function DashboardAudioView({
             Bulan {cycle.currentMonth} · Hari {cycle.dayInCurrentCycle}/30
           </div>
           {isPro && (
-            <span className="rounded-full bg-[#C89B4E]/25 px-2.5 py-1 text-[9px] font-extrabold uppercase tracking-[0.16em] text-[#F0DDB4] ring-1 ring-[#EAD8AF]/30">
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#C89B4E]/25 px-2.5 py-1 text-[9px] font-extrabold uppercase tracking-[0.16em] text-[#F0DDB4] ring-1 ring-[#EAD8AF]/30">
+              <Crown className="h-2.5 w-2.5 text-[#EAD8AF]" />
               Muhsinin
             </span>
           )}

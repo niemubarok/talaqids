@@ -6,7 +6,7 @@ import {
   Check,
   ChevronRight,
   Compass,
-  HeartHandshake,
+  Crown,
   Info,
   Lock,
   Plus,
@@ -213,7 +213,7 @@ export function ProfileDropdown({
         >
           <div className="flex items-center gap-2.5">
             <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#C89B4E]/15 text-[#8A6220]">
-              <HeartHandshake className="h-3.5 w-3.5" />
+              <Crown className="h-3.5 w-3.5" />
             </span>
             <div>
               <p className="text-[11.5px] font-extrabold text-[#15231E]">Infaq &amp; Muhsinin</p>

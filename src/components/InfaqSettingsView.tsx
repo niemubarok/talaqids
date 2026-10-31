@@ -6,6 +6,7 @@ import {
   Check,
   Cloud,
   Compass,
+  Crown,
   HeartHandshake,
   Info,
   Loader2,
@@ -153,7 +154,7 @@ export function InfaqSettingsView({
               : 'bg-[#EAD8AF] text-[#15231E]'
           }`}
         >
-          <Sparkles
+          <Crown
             className={`h-3 w-3 ${settings.isProUser ? 'text-[#EAD8AF]' : 'text-[#1E4C40]'}`}
           />
           {settings.isProUser ? 'Tier Muhsinin Aktif' : 'Free Tier'}

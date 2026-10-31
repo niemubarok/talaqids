@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { BookOpen, ChevronDown, HeartHandshake, LayoutDashboard, Lock, Menu, RefreshCw, Sparkles } from 'lucide-react';
+import { BookOpen, ChevronDown, Crown, LayoutDashboard, Lock, Menu, RefreshCw, Sparkles } from 'lucide-react';
 import {
   db,
   DEFAULT_APP_SETTINGS,
@@ -27,6 +27,7 @@ import { InsightsView } from '@/components/InsightsView';
 import { NowPlayingBar } from '@/components/NowPlayingBar';
 import { NowPlayingSheet } from '@/components/NowPlayingSheet';
 import { PwaInstallBanner } from '@/components/PwaInstallBanner';
+import { PwaUpdatePrompt } from '@/components/PwaUpdatePrompt';
 import { GoogleDriveIcon } from '@/components/GoogleDriveIcon';
 import { OnboardingGuide } from '@/components/OnboardingGuide';
 import { ProfileDropdown } from '@/components/ProfileDropdown';
@@ -163,11 +164,20 @@ export default function HomePage() {
 
   const handleCleanOldCache = async () => {
     const count = await clearPreviousJuzCaches();
+    if ('caches' in window) {
+      try {
+        const cacheKeys = await caches.keys();
+        await Promise.all(cacheKeys.map((name) => caches.delete(name)));
+      } catch {
+        // Ignore cache deletion error
+      }
+    }
     alert(
       count > 0
-        ? `${count} cache audio Juz bulan sebelumnya berhasil dibersihkan.`
-        : 'Penyimpanan audio offline sudah bersih.'
+        ? `${count} cache audio Juz dan cache aplikasi berhasil dibersihkan.`
+        : 'Penyimpanan & cache aplikasi telah dibersihkan dan diperbarui.'
     );
+    window.location.reload();
   };
 
   // Launch onboarding guide for first-time user
@@ -305,6 +315,9 @@ export default function HomePage() {
     <div className="app-canvas relative flex min-h-dvh flex-col">
       <div className="app-grain pointer-events-none fixed inset-0 z-0" aria-hidden />
 
+      {/* PWA Update Notification */}
+      <PwaUpdatePrompt />
+
       {/* Top App Bar */}
       <header className="sticky top-0 z-30 w-full border-b border-[#1E4C40]/8 bg-[#F6F0E4]/80 backdrop-blur-xl">
         <div
@@ -366,16 +379,20 @@ export default function HomePage() {
                 title={
                   settings.isProUser
                     ? 'Status Muhsinin Aktif • Barakallahu fiikum'
-                    : 'Infaq & Dukung talaQids'
+                    : 'Tier Muhsinin & Infaq'
                 }
-                aria-label="Infaq & Muhsinin"
+                aria-label="Tier Muhsinin & Infaq"
                 className={`relative flex h-9 w-9 shrink-0 items-center justify-center transition active:scale-90 ${
                   settings.isProUser
                     ? 'text-[#C89B4E] hover:text-[#8A6220]'
                     : 'text-[#1E4C40] hover:text-[#C89B4E]'
                 }`}
               >
-                <HeartHandshake className="h-[22px] w-[22px] shrink-0 stroke-[2.2]" />
+                <Crown
+                  className={`h-[22px] w-[22px] shrink-0 stroke-[2.2] ${
+                    settings.isProUser ? 'fill-[#C89B4E]/30 text-[#C89B4E]' : ''
+                  }`}
+                />
                 {settings.isProUser && (
                   <span className="absolute bottom-0.5 right-0.5 h-2 w-2 rounded-full bg-[#C89B4E] ring-1.5 ring-[#F6F0E4]" />
                 )}
