@@ -135,7 +135,7 @@ export function ReciterProfileModal({
           </div>
 
           {/* Main Portrait & Identity */}
-          <div className="relative mt-3.5 flex items-center gap-3.5">
+          <div className="relative mt-3.5 flex items-start gap-3.5">
             <div className="relative h-18 w-18 shrink-0 overflow-hidden rounded-2xl border-2 border-[#EAD8AF]/80 bg-[#15352C] shadow-[0_12px_28px_rgba(0,0,0,0.35)]">
               <Image
                 src={viewedReciter.photoUrl}
@@ -159,7 +159,7 @@ export function ReciterProfileModal({
               >
                 {viewedReciter.name}
               </h3>
-              <p className="mt-0.5 truncate text-[10px] font-semibold text-[#EAD8AF]/90">
+              <p className="mt-0.5 text-[10.5px] font-semibold leading-relaxed text-[#EAD8AF]/90">
                 {viewedReciter.roleTitle}
               </p>
               <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[9px] font-bold text-white/80">
