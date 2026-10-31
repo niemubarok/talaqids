@@ -20,6 +20,7 @@ interface StoredToken {
 export interface CloudBackupPayload {
   schemaVersion: 1;
   updatedAt: string;
+  deletedChildIds?: string[];
   children: ChildProfile[];
   progress: Omit<DailyProgress, 'id'>[];
   settings: {
@@ -29,6 +30,7 @@ export interface CloudBackupPayload {
     maxVolumeCap: number;
     enableBackgroundWakeLock: boolean;
     activeChildId?: string;
+    deletedChildIds?: string[];
   };
 }
 
@@ -211,6 +213,12 @@ export function mergeCloudAndLocalData(
   local: CloudBackupPayload,
   remote: CloudBackupPayload
 ): CloudBackupPayload {
+  // 0. Collect all deleted children tombstones across local and remote
+  const allDeletedChildIds = new Set<string>([
+    ...(local.deletedChildIds || local.settings?.deletedChildIds || []),
+    ...(remote.deletedChildIds || remote.settings?.deletedChildIds || []),
+  ]);
+
   // 1. Merge and Deduplicate Children
   // Match by UUID first, then fallback to normalized name + birthDate
   // to avoid duplicates if the same child was registered on multiple devices before sync.
@@ -221,17 +229,37 @@ export function mergeCloudAndLocalData(
   const getChildFingerprint = (c: ChildProfile) =>
     `${(c.name || '').trim().toLowerCase()}__${c.birthDate}`;
 
+  const pickNewestPlayback = (c1?: ChildProfile, c2?: ChildProfile) => {
+    if (!c1?.lastPlayback) return c2?.lastPlayback;
+    if (!c2?.lastPlayback) return c1?.lastPlayback;
+    const t1 = Date.parse(c1.lastPlayback.updatedAt || '1970-01-01');
+    const t2 = Date.parse(c2.lastPlayback.updatedAt || '1970-01-01');
+    return t1 >= t2 ? c1.lastPlayback : c2.lastPlayback;
+  };
+
   const processChild = (child: ChildProfile) => {
+    // If child is marked as deleted on either device, do not merge or restore!
+    if (allDeletedChildIds.has(child.id)) {
+      return;
+    }
+
     const fp = getChildFingerprint(child);
     const existingIdByFp = fingerprintToId.get(fp);
+
+    if (existingIdByFp && allDeletedChildIds.has(existingIdByFp)) {
+      return;
+    }
 
     if (childrenMap.has(child.id)) {
       const existing = childrenMap.get(child.id)!;
       const childTime = Date.parse(child.updatedAt || child.createdAt || '1970-01-01');
       const existingTime = Date.parse(existing.updatedAt || existing.createdAt || '1970-01-01');
-      if (childTime >= existingTime) {
-        childrenMap.set(child.id, child);
-      }
+      const winning = childTime >= existingTime ? child : existing;
+      const newestPlayback = pickNewestPlayback(child, existing);
+      childrenMap.set(child.id, {
+        ...winning,
+        lastPlayback: newestPlayback || winning.lastPlayback,
+      });
       fingerprintToId.set(fp, child.id);
     } else if (existingIdByFp && childrenMap.has(existingIdByFp)) {
       // Same child name & birthdate, but different UUID generated on another device
@@ -240,12 +268,13 @@ export function mergeCloudAndLocalData(
       const existing = childrenMap.get(canonicalId)!;
       const childTime = Date.parse(child.updatedAt || child.createdAt || '1970-01-01');
       const existingTime = Date.parse(existing.updatedAt || existing.createdAt || '1970-01-01');
-      if (childTime >= existingTime) {
-        childrenMap.set(canonicalId, {
-          ...child,
-          id: canonicalId,
-        });
-      }
+      const winning = childTime >= existingTime ? child : existing;
+      const newestPlayback = pickNewestPlayback(child, existing);
+      childrenMap.set(canonicalId, {
+        ...winning,
+        id: canonicalId,
+        lastPlayback: newestPlayback || winning.lastPlayback,
+      });
     } else {
       childrenMap.set(child.id, child);
       fingerprintToId.set(fp, child.id);
@@ -260,10 +289,12 @@ export function mergeCloudAndLocalData(
   }
 
   // 2. Merge Daily Progress by `${childId}__${date}`
-  // Resolve childId aliases from deduplicated children
+  // Resolve childId aliases from deduplicated children, and discard progress of deleted children
   const progressMap = new Map<string, Omit<DailyProgress, 'id'>>();
   for (const item of remote.progress || []) {
     const resolvedChildId = idAliases.get(item.childId) || item.childId;
+    if (allDeletedChildIds.has(resolvedChildId)) continue;
+
     const key = `${resolvedChildId}__${item.date}`;
     progressMap.set(key, {
       childId: resolvedChildId,
@@ -280,6 +311,8 @@ export function mergeCloudAndLocalData(
 
   for (const localItem of local.progress || []) {
     const resolvedChildId = idAliases.get(localItem.childId) || localItem.childId;
+    if (allDeletedChildIds.has(resolvedChildId)) continue;
+
     const key = `${resolvedChildId}__${localItem.date}`;
     const remoteItem = progressMap.get(key);
     if (!remoteItem) {
@@ -350,16 +383,25 @@ export function mergeCloudAndLocalData(
   // 3. Merge Settings
   const isProUser = Boolean(local.settings.isProUser || remote.settings.isProUser);
   const mergedChildren = Array.from(childrenMap.values());
-  const preferredActiveChildId =
+  let preferredActiveChildId =
     (local.settings.activeChildId && idAliases.get(local.settings.activeChildId)) ||
     local.settings.activeChildId ||
     (remote.settings.activeChildId && idAliases.get(remote.settings.activeChildId)) ||
-    remote.settings.activeChildId ||
-    mergedChildren[0]?.id;
+    remote.settings.activeChildId;
+
+  if (preferredActiveChildId && allDeletedChildIds.has(preferredActiveChildId)) {
+    preferredActiveChildId = undefined;
+  }
+  if (!preferredActiveChildId) {
+    preferredActiveChildId = mergedChildren[0]?.id;
+  }
+
+  const combinedDeletedList = Array.from(allDeletedChildIds);
 
   return {
     schemaVersion: 1,
     updatedAt: new Date().toISOString(),
+    deletedChildIds: combinedDeletedList,
     children: mergedChildren,
     progress: Array.from(progressMap.values()),
     settings: {
@@ -372,6 +414,7 @@ export function mergeCloudAndLocalData(
         remote.settings.enableBackgroundWakeLock ??
         true,
       activeChildId: preferredActiveChildId,
+      deletedChildIds: combinedDeletedList,
     },
   };
 }
@@ -390,6 +433,7 @@ export async function buildLocalBackupPayload(): Promise<CloudBackupPayload> {
   return {
     schemaVersion: 1,
     updatedAt: new Date().toISOString(),
+    deletedChildIds: currentSettings.deletedChildIds || [],
     children,
     progress: cleanProgress,
     settings: {
@@ -399,6 +443,7 @@ export async function buildLocalBackupPayload(): Promise<CloudBackupPayload> {
       maxVolumeCap: currentSettings.maxVolumeCap,
       enableBackgroundWakeLock: currentSettings.enableBackgroundWakeLock,
       activeChildId: currentSettings.activeChildId,
+      deletedChildIds: currentSettings.deletedChildIds || [],
     },
   };
 }
@@ -412,9 +457,16 @@ export async function applyMergedPayloadToLocalDb(
   }
 ): Promise<void> {
   await db.transaction('rw', db.children, db.progress, db.settings, async () => {
-    // Replace all children with the deduplicated and merged children list
+    // Replace all children with the deduplicated and non-deleted children list
     await db.children.clear();
-    await db.children.bulkPut(merged.children);
+    if (merged.children.length > 0) {
+      await db.children.bulkPut(merged.children);
+    }
+
+    // Purge progress records belonging to deleted children
+    for (const delId of merged.deletedChildIds || []) {
+      await db.progress.where('childId').equals(delId).delete();
+    }
 
     for (const item of merged.progress) {
       const existing = await db.progress
@@ -430,10 +482,17 @@ export async function applyMergedPayloadToLocalDb(
     }
 
     const currentSettings = (await db.settings.get('app_config')) || DEFAULT_APP_SETTINGS;
+    const combinedDeleted = Array.from(
+      new Set([
+        ...(currentSettings.deletedChildIds || []),
+        ...(merged.deletedChildIds || []),
+      ])
+    );
     await db.settings.put({
       ...currentSettings,
       ...merged.settings,
       key: 'app_config',
+      deletedChildIds: combinedDeleted,
       googleDriveEmail: extraMeta?.googleDriveEmail ?? currentSettings.googleDriveEmail,
       googleDriveFileId: extraMeta?.googleDriveFileId ?? currentSettings.googleDriveFileId,
       googleDriveLastSyncedAt:

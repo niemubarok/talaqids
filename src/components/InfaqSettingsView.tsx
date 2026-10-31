@@ -5,6 +5,7 @@ import Image from 'next/image';
 import {
   Check,
   Cloud,
+  Compass,
   HeartHandshake,
   Info,
   Loader2,
@@ -24,6 +25,7 @@ import { EditChildModal } from '@/components/EditChildModal';
 import { updateChildProfile, deleteChildProfile } from '@/lib/db';
 import { RECITERS, type Reciter } from '@/lib/quran-metadata';
 import { ReciterProfileModal } from '@/components/ReciterProfileModal';
+import { GoogleDriveIcon } from '@/components/GoogleDriveIcon';
 import {
   activateMuhsininTier,
   db,
@@ -46,6 +48,7 @@ interface InfaqSettingsViewProps {
   isSyncingCloud?: boolean;
   cloudError?: string | null;
   onManualSyncCloud?: () => Promise<void>;
+  onOpenGuide?: () => void;
 }
 
 const INFAQ_OPTIONS = [
@@ -79,6 +82,7 @@ export function InfaqSettingsView({
   isSyncingCloud = false,
   cloudError = null,
   onManualSyncCloud,
+  onOpenGuide,
 }: InfaqSettingsViewProps) {
   const { clearPreviousJuzCaches } = useAudioPlayer();
   const [selectedNominal, setSelectedNominal] = useState(75000);
@@ -506,8 +510,15 @@ export function InfaqSettingsView({
               Data disimpan di folder tersembunyi Google Drive pribadi Anda (<code className="font-mono text-[9.5px] text-[#1E4C40]">talaqids_data.json</code>). Privasi terjaga 100%.
             </p>
           </div>
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-[#1E4C40]/10 text-[#1E4C40]">
-            {settings.isProUser ? <Cloud className="h-4 w-4" /> : <Lock className="h-4 w-4 text-[#9C7330]" />}
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-[#FFFCF5] shadow-xs ring-1 ring-[#1E4C40]/10">
+            <div className="relative flex items-center justify-center">
+              <GoogleDriveIcon className="h-5 w-5 shrink-0" />
+              {!settings.isProUser && (
+                <span className="absolute -bottom-1 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#C89B4E] text-[#15231E] shadow-xs ring-1 ring-[#FFFCF5]">
+                  <Lock className="h-2 w-2 stroke-[2.8]" />
+                </span>
+              )}
+            </div>
           </span>
         </div>
 
@@ -541,24 +552,31 @@ export function InfaqSettingsView({
                 type="button"
                 disabled={!settings.isProUser || isSyncingCloud}
                 onClick={() => void onManualSyncCloud?.()}
-                className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[10px] font-extrabold shadow-sm transition ${
+                className={`flex items-center gap-2 rounded-full px-3 py-1.5 text-[10px] font-extrabold shadow-sm transition ${
                   settings.isProUser
                     ? 'bg-[#1E4C40] text-[#F3E7CB] hover:bg-[#163a31] active:scale-95 disabled:opacity-60'
                     : 'cursor-not-allowed bg-[#C89B4E]/20 text-[#9C7330]'
                 }`}
               >
-                {!settings.isProUser ? (
-                  <Lock className="h-3 w-3" />
-                ) : isSyncingCloud ? (
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                ) : (
-                  <RefreshCw className="h-3 w-3" />
-                )}
+                <div className="relative flex shrink-0 items-center justify-center">
+                  <GoogleDriveIcon className="h-3.5 w-3.5 shrink-0" />
+                  {!settings.isProUser ? (
+                    <span className="absolute -bottom-1 -right-1.5 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-[#C89B4E] text-[#15231E] ring-1 ring-white">
+                      <Lock className="h-1.5 w-1.5 stroke-[2.8]" />
+                    </span>
+                  ) : isSyncingCloud ? (
+                    <span className="absolute -bottom-1 -right-1.5 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-[#1E4C40] text-white">
+                      <Loader2 className="h-1.5 w-1.5 animate-spin" />
+                    </span>
+                  ) : null}
+                </div>
                 {!settings.isProUser
                   ? 'Terkunci'
-                  : settings.googleDriveLastSyncedAt
-                    ? 'Sinkronkan'
-                    : 'Hubungkan Google Drive'}
+                  : isSyncingCloud
+                    ? 'Menyinkronkan...'
+                    : settings.googleDriveLastSyncedAt
+                      ? 'Sinkronkan'
+                      : 'Hubungkan Google Drive'}
               </button>
 
               {settings.isProUser && (settings.googleDriveEmail || settings.googleDriveLastSyncedAt) && (
@@ -613,6 +631,34 @@ export function InfaqSettingsView({
           </p>
         )}
       </section>
+
+      {/* ── Bantuan & Panduan Aplikasi ── */}
+      {onOpenGuide && (
+        <section className="surface rise p-4 [animation-delay:180ms]">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#C89B4E]/15 text-[#8A6220]">
+                <Compass className="h-5 w-5" />
+              </span>
+              <div>
+                <h3 className="text-[12px] font-extrabold text-[#15231E]">
+                  Panduan Fitur Aplikasi (Tour)
+                </h3>
+                <p className="text-[10px] text-[#6B7A72]">
+                  Pelajari siklus 30 juz, volume aman bayi, mushaf, dan sinkronisasi.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={onOpenGuide}
+              className="shrink-0 rounded-full border border-[#1E4C40]/15 bg-[#FFFCF5] px-3.5 py-1.5 text-[10.5px] font-extrabold text-[#1E4C40] shadow-xs transition hover:bg-[#1E4C40]/8 active:scale-95"
+            >
+              Mulai Tur
+            </button>
+          </div>
+        </section>
+      )}
 
       {/* ── Reciter Profile Modal ────────────────────────────────────── */}
       <ReciterProfileModal

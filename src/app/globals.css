@@ -255,6 +255,22 @@ body {
   animation: sheet-up 0.32s cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
 
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.pop-in {
+  animation: pop-in 0.2s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  transform-origin: bottom center;
+}
+
 @keyframes breathe {
   0%,
   100% {
@@ -274,6 +290,7 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .rise,
   .sheet-up,
+  .pop-in,
   .breathe,
   .eq-bar {
     animation: none !important;

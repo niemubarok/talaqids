@@ -318,6 +318,9 @@ export interface AyahTrackItem {
   mushafPage: number; // 1 to 604 in Madinah Mushaf
 }
 
+import { getMushafPageForAyah } from './mushaf-pages';
+export { getMushafPageForAyah };
+
 export function getJuzAyahTracks(juz: number, reciterId: string): AyahTrackItem[] {
   const meta = getJuzMeta(juz);
   const rawTracks: Omit<AyahTrackItem, 'relativePage' | 'mushafPage'>[] = [];
@@ -339,15 +342,14 @@ export function getJuzAyahTracks(juz: number, reciterId: string): AyahTrackItem[
     }
   }
 
-  const totalPages = Math.min(20, meta.endPage - meta.startPage + 1);
-  const totalTracks = Math.max(1, rawTracks.length);
+  const totalPagesInJuz = meta.endPage - meta.startPage + 1;
 
-  return rawTracks.map((item, idx) => {
-    const relativePage = Math.min(
-      totalPages,
-      Math.floor((idx / totalTracks) * totalPages) + 1
+  return rawTracks.map((item) => {
+    const mushafPage = getMushafPageForAyah(item.surahNumber, item.ayahNumber);
+    const relativePage = Math.max(
+      1,
+      Math.min(totalPagesInJuz, mushafPage - meta.startPage + 1)
     );
-    const mushafPage = meta.startPage + relativePage - 1;
     return {
       ...item,
       relativePage,

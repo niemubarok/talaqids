@@ -82,7 +82,10 @@ export function DashboardAudioView({
   return (
     <div className="space-y-4">
       {/* ── Siklus hero ─────────────────────────────────────────────── */}
-      <section className="rise relative overflow-hidden rounded-[30px] hero-surface p-5 text-white shadow-[0_36px_80px_-46px_rgba(16,46,39,0.95)]">
+      <section
+        data-guide="dashboard-cycle"
+        className="rise relative overflow-hidden rounded-[30px] hero-surface p-5 text-white shadow-[0_36px_80px_-46px_rgba(16,46,39,0.95)]"
+      >
         <div className="pointer-events-none absolute -right-14 -top-20 h-56 w-56 rounded-full border border-[#EAD8AF]/15" />
         <div className="pointer-events-none absolute -right-4 top-8 h-28 w-28 rounded-full border border-[#EAD8AF]/10" />
         <div className="pointer-events-none absolute -left-16 bottom-0 h-40 w-40 rounded-full bg-[#C89B4E]/10 blur-2xl" />
@@ -221,7 +224,10 @@ export function DashboardAudioView({
       </section>
 
       {/* ── Today & Cumulative Stats ────────────────────────────────── */}
-      <div className="rise grid grid-cols-2 gap-3 [animation-delay:60ms]">
+      <div
+        data-guide="dashboard-routine"
+        className="rise grid grid-cols-2 gap-3 [animation-delay:60ms]"
+      >
         <div className="surface p-4">
           <div className="flex items-center justify-between">
             <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-[#1E4C40]/8 text-[#1E4C40]">

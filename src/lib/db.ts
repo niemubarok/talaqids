@@ -1,3 +1,12 @@
+export interface ChildPlaybackCheckpoint {
+  juzNumber: number;
+  surahNumber: number;
+  ayahNumber: number;
+  trackIndex: number;
+  currentTime: number;
+  updatedAt: string; // ISO string
+}
+
 import Dexie, { type Table } from 'dexie';
 
 export interface ChildProfile {
@@ -9,6 +18,7 @@ export interface ChildProfile {
   isConsolidationMode: boolean; // default: false
   manualJuzOverride?: number | null; // Optional manual Juz override (1-30)
   customMaxVolume?: number; // default 0.6
+  lastPlayback?: ChildPlaybackCheckpoint;
   createdAt: string;
   updatedAt: string;
 }
@@ -36,9 +46,11 @@ export interface AppSettings {
   maxVolumeCap: number; // Default: 0.6
   enableBackgroundWakeLock: boolean;
   activeChildId?: string;
+  deletedChildIds?: string[];
   googleDriveEmail?: string;
   googleDriveLastSyncedAt?: string;
   googleDriveFileId?: string;
+  preferredQuranSource?: string;
 }
 
 export function notifyLocalDataMutated(): void {

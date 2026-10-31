@@ -2,7 +2,13 @@
 
 import { useEffect, useSyncExternalStore, useCallback } from 'react';
 import { getJuzAyahTracks, RECITERS, type AyahTrackItem } from '@/lib/quran-metadata';
-import { db, incrementListenMinutes, markPagesCompletedByAudio } from '@/lib/db';
+import {
+  db,
+  incrementListenMinutes,
+  markPagesCompletedByAudio,
+  notifyLocalDataMutated,
+  type ChildPlaybackCheckpoint,
+} from '@/lib/db';
 
 const MAX_SAFE_VOLUME = 0.6; // Strict 60% Baby-Safe Volume Cap
 
@@ -43,6 +49,7 @@ class AudioEngineSingleton {
   private listeners = new Set<Listener>();
   private sleepInterval: ReturnType<typeof setInterval> | null = null;
   private listenAccumulatorSeconds = 0;
+  private lastDbPersistTime = 0;
 
   private state: AudioPlayerState = {
     isPlaying: false,
@@ -97,7 +104,7 @@ class AudioEngineSingleton {
 
       this.audio.addEventListener('pause', () => {
         this.setState({ isPlaying: false });
-        this.savePlaybackCheckpoint();
+        this.savePlaybackCheckpoint(undefined, undefined, true);
         this.updateMediaSessionPlaybackState('paused');
       });
 
@@ -134,6 +141,17 @@ class AudioEngineSingleton {
           error: 'Gagal memuat audio. Periksa koneksi internet atau unduh Juz untuk mode offline.',
         });
       });
+
+      if (typeof window !== 'undefined') {
+        window.addEventListener('beforeunload', () => {
+          this.savePlaybackCheckpoint(undefined, undefined, true);
+        });
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'hidden') {
+            this.savePlaybackCheckpoint(undefined, undefined, true);
+          }
+        });
+      }
 
       this.startTimers();
     }
@@ -234,9 +252,49 @@ class AudioEngineSingleton {
     return `talaqids-playback-v1-${childId || 'default'}-juz-${juz}`;
   }
 
+  private persistPlaybackToChildDb(
+    trackIndex = this.state.currentTrackIndex,
+    currentTime = this.state.currentTime,
+    force = false
+  ): void {
+    const childId = this.state.activeChildId;
+    if (!childId) return;
+
+    const currentTrack = this.state.tracks[trackIndex];
+    if (!currentTrack) return;
+
+    const now = Date.now();
+    // Throttle writes during playback to every 5 seconds unless forced (pause/track change)
+    if (!force && now - this.lastDbPersistTime < 5000) {
+      return;
+    }
+    this.lastDbPersistTime = now;
+
+    const nowIso = new Date().toISOString();
+    void db.children
+      .update(childId, {
+        lastPlayback: {
+          juzNumber: this.state.activeJuz,
+          surahNumber: currentTrack.surahNumber,
+          ayahNumber: currentTrack.ayahNumber,
+          trackIndex,
+          currentTime: Math.floor(currentTime),
+          updatedAt: nowIso,
+        },
+        updatedAt: nowIso,
+      })
+      .then((updated) => {
+        if (updated && force) {
+          notifyLocalDataMutated();
+        }
+      })
+      .catch(() => {});
+  }
+
   private savePlaybackCheckpoint(
     trackIndex = this.state.currentTrackIndex,
-    currentTime = this.state.currentTime
+    currentTime = this.state.currentTime,
+    force = false
   ): void {
     if (typeof window === 'undefined') return;
     try {
@@ -248,6 +306,7 @@ class AudioEngineSingleton {
         updatedAt: Date.now(),
       };
       window.localStorage.setItem(key, JSON.stringify(data));
+      this.persistPlaybackToChildDb(trackIndex, currentTime, force);
     } catch {
       // Ignore storage errors
     }
@@ -256,25 +315,51 @@ class AudioEngineSingleton {
   private loadPlaybackCheckpoint(
     childId: string | null,
     juz: number,
-    maxTracks: number
+    maxTracks: number,
+    cloudPlayback?: ChildPlaybackCheckpoint
   ): PlaybackCheckpoint | null {
     if (typeof window === 'undefined') return null;
+    let localCheckpoint: PlaybackCheckpoint | null = null;
     try {
       const key = this.getCheckpointStorageKey(childId, juz);
       const raw = window.localStorage.getItem(key);
-      if (!raw) return null;
-      const parsed = JSON.parse(raw) as PlaybackCheckpoint;
-      if (typeof parsed.trackIndex !== 'number') return null;
-      const safeIndex = Math.max(0, Math.min(maxTracks - 1, parsed.trackIndex));
-      return {
-        trackIndex: safeIndex,
-        currentTime: Math.max(0, parsed.currentTime || 0),
-        volume: parsed.volume,
-        updatedAt: parsed.updatedAt || Date.now(),
-      };
+      if (raw) {
+        const parsed = JSON.parse(raw) as PlaybackCheckpoint;
+        if (typeof parsed.trackIndex === 'number') {
+          localCheckpoint = {
+            trackIndex: Math.max(0, Math.min(maxTracks - 1, parsed.trackIndex)),
+            currentTime: Math.max(0, parsed.currentTime || 0),
+            volume: parsed.volume,
+            updatedAt: parsed.updatedAt || 0,
+          };
+        }
+      }
     } catch {
-      return null;
+      // Ignore
     }
+
+    // Check if cloudPlayback is available and newer than local checkpoint
+    if (cloudPlayback && cloudPlayback.juzNumber === juz) {
+      const cloudTime = Date.parse(cloudPlayback.updatedAt || '1970-01-01');
+      const localTime = localCheckpoint?.updatedAt || 0;
+
+      if (!localCheckpoint || cloudTime > localTime) {
+        const safeIndex = Math.max(0, Math.min(maxTracks - 1, cloudPlayback.trackIndex));
+        const mergedCheckpoint: PlaybackCheckpoint = {
+          trackIndex: safeIndex,
+          currentTime: Math.max(0, cloudPlayback.currentTime || 0),
+          volume: localCheckpoint?.volume,
+          updatedAt: cloudTime,
+        };
+        try {
+          const key = this.getCheckpointStorageKey(childId, juz);
+          window.localStorage.setItem(key, JSON.stringify(mergedCheckpoint));
+        } catch {}
+        return mergedCheckpoint;
+      }
+    }
+
+    return localCheckpoint;
   }
 
   private syncPassedMushafPages(maxCompletedRelativePage: number): void {
@@ -291,6 +376,7 @@ class AudioEngineSingleton {
     reciterId: string;
     childId: string | null;
     cycleMonth: number;
+    lastPlayback?: ChildPlaybackCheckpoint;
   }): void {
     const juzChanged = params.juz !== this.state.activeJuz;
     const reciterChanged = params.reciterId !== this.state.reciterId;
@@ -301,7 +387,12 @@ class AudioEngineSingleton {
       const onlyReciterChanged = reciterChanged && !juzChanged && !childChanged;
       const checkpoint = onlyReciterChanged
         ? null
-        : this.loadPlaybackCheckpoint(params.childId, params.juz, newTracks.length);
+        : this.loadPlaybackCheckpoint(
+            params.childId,
+            params.juz,
+            newTracks.length,
+            params.lastPlayback
+          );
       const restoredIndex = onlyReciterChanged
         ? Math.min(this.state.currentTrackIndex, Math.max(0, newTracks.length - 1))
         : checkpoint
@@ -343,6 +434,39 @@ class AudioEngineSingleton {
         this.audio.removeAttribute('src');
       }
     } else {
+      // Session identifiers (juz, reciter, child) didn't change.
+      // But cloud sync may have provided a newer playback checkpoint from another device!
+      if (
+        !this.state.isPlaying &&
+        params.lastPlayback &&
+        params.lastPlayback.juzNumber === this.state.activeJuz
+      ) {
+        const cloudTime = Date.parse(params.lastPlayback.updatedAt || '1970-01-01');
+        const currentCheckpoint = this.loadPlaybackCheckpoint(
+          params.childId,
+          params.juz,
+          this.state.tracks.length
+        );
+        const localTime = currentCheckpoint?.updatedAt || 0;
+
+        if (cloudTime > localTime) {
+          const newIndex = Math.max(
+            0,
+            Math.min(this.state.tracks.length - 1, params.lastPlayback.trackIndex)
+          );
+          const newTime = Math.max(0, params.lastPlayback.currentTime || 0);
+
+          this.savePlaybackCheckpoint(newIndex, newTime, false);
+          this.setState({
+            currentTrackIndex: newIndex,
+            currentTime: newTime,
+          });
+          if (this.audio) {
+            this.audio.removeAttribute('src');
+          }
+        }
+      }
+
       this.setState({
         activeChildId: params.childId,
         currentCycleMonth: params.cycleMonth,
@@ -365,7 +489,7 @@ class AudioEngineSingleton {
       error: null,
     });
 
-    this.savePlaybackCheckpoint(safeIndex, resumeTimeSeconds);
+    this.savePlaybackCheckpoint(safeIndex, resumeTimeSeconds, true);
 
     // If audio has reached relativePage > 1, all previous pages (1 .. relativePage - 1) have been passed
     if (track.relativePage > 1) {
@@ -443,7 +567,7 @@ class AudioEngineSingleton {
   public pause(): void {
     if (!this.audio) return;
     this.audio.pause();
-    this.savePlaybackCheckpoint();
+    this.savePlaybackCheckpoint(undefined, undefined, true);
     this.setState({ isPlaying: false });
   }
 
@@ -474,7 +598,7 @@ class AudioEngineSingleton {
     if (!this.audio || !Number.isFinite(seconds)) return;
     this.audio.currentTime = Math.max(0, Math.min(seconds, this.audio.duration || seconds));
     this.setState({ currentTime: this.audio.currentTime });
-    this.savePlaybackCheckpoint(this.state.currentTrackIndex, this.audio.currentTime);
+    this.savePlaybackCheckpoint(this.state.currentTrackIndex, this.audio.currentTime, true);
   }
 
   public setVolume(requestedVolume: number): void {
@@ -522,7 +646,7 @@ class AudioEngineSingleton {
       error: null,
     });
 
-    this.savePlaybackCheckpoint(currentIndex, 0);
+    this.savePlaybackCheckpoint(currentIndex, 0, true);
 
     if (this.state.activeChildId) {
       void db.children.update(this.state.activeChildId, {
@@ -562,7 +686,7 @@ class AudioEngineSingleton {
         sleepTimerMode: 'off',
         sleepRemainingSeconds: null,
       });
-      this.savePlaybackCheckpoint(0, 0);
+      this.savePlaybackCheckpoint(0, 0, true);
       return;
     }
 
@@ -693,7 +817,13 @@ export function useAudioPlayer() {
   }, []);
 
   const configureSession = useCallback(
-    (params: { juz: number; reciterId: string; childId: string | null; cycleMonth: number }) => {
+    (params: {
+      juz: number;
+      reciterId: string;
+      childId: string | null;
+      cycleMonth: number;
+      lastPlayback?: ChildPlaybackCheckpoint;
+    }) => {
       audioSingleton.configureSession(params);
     },
     []
@@ -728,7 +858,13 @@ export function useAudioPlayer() {
  */
 export function useAudioSessionConfig() {
   return useCallback(
-    (params: { juz: number; reciterId: string; childId: string | null; cycleMonth: number }) => {
+    (params: {
+      juz: number;
+      reciterId: string;
+      childId: string | null;
+      cycleMonth: number;
+      lastPlayback?: ChildPlaybackCheckpoint;
+    }) => {
       audioSingleton.configureSession(params);
     },
     []

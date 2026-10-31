@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { BookOpen, ChevronDown, Cloud, LayoutDashboard, Lock, RefreshCw, Sparkles } from 'lucide-react';
+import { BookOpen, ChevronDown, HeartHandshake, LayoutDashboard, Lock, Menu, RefreshCw, Sparkles } from 'lucide-react';
 import {
   db,
   DEFAULT_APP_SETTINGS,
@@ -12,25 +12,33 @@ import {
   notifyLocalDataMutated,
 } from '@/lib/db';
 import {
+  disconnectGoogleDrive,
   formatRelativeSyncTime,
   getConfiguredGoogleClientId,
   getStoredAccessToken,
   syncWithGoogleDrive,
 } from '@/lib/google-drive-sync';
 import { calculateCycleStatus } from '@/lib/cycle-math';
-import { useAudioSessionConfig } from '@/hooks/useAudioPlayer';
+import { useAudioPlayer, useAudioSessionConfig } from '@/hooks/useAudioPlayer';
 import { OnboardingModal } from '@/components/OnboardingModal';
 import { DashboardAudioView } from '@/components/DashboardAudioView';
 import { MushafManualView } from '@/components/MushafManualView';
 import { InsightsView } from '@/components/InsightsView';
-import { InfaqSettingsView } from '@/components/InfaqSettingsView';
 import { NowPlayingBar } from '@/components/NowPlayingBar';
 import { NowPlayingSheet } from '@/components/NowPlayingSheet';
 import { PwaInstallBanner } from '@/components/PwaInstallBanner';
+import { GoogleDriveIcon } from '@/components/GoogleDriveIcon';
+import { OnboardingGuide } from '@/components/OnboardingGuide';
+import { ProfileDropdown } from '@/components/ProfileDropdown';
+import { ManageChildrenModal } from '@/components/ManageChildrenModal';
+import { RecitersModal } from '@/components/RecitersModal';
+import { InfaqModal } from '@/components/InfaqModal';
+import { GoogleDriveSyncModal } from '@/components/GoogleDriveSyncModal';
+import { AboutModal } from '@/components/AboutModal';
 
-type ActiveTab = 'audio' | 'mushaf' | 'insights' | 'infaq';
+type ActiveTab = 'audio' | 'mushaf' | 'insights';
 
-const NAV_ITEMS: { id: Exclude<ActiveTab, 'infaq'>; label: string; icon: typeof LayoutDashboard }[] = [
+const NAV_ITEMS: { id: ActiveTab; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'audio', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'mushaf', label: 'Mushaf', icon: BookOpen },
   { id: 'insights', label: 'Insights', icon: Sparkles },
@@ -42,10 +50,19 @@ export default function HomePage() {
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
   const [isSyncingCloud, setIsSyncingCloud] = useState(false);
   const [cloudError, setCloudError] = useState<string | null>(null);
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [showManageChildrenModal, setShowManageChildrenModal] = useState(false);
+  const [showRecitersModal, setShowRecitersModal] = useState(false);
+  const [showInfaqModal, setShowInfaqModal] = useState(false);
+  const [showDriveModal, setShowDriveModal] = useState(false);
+  const [showAboutModal, setShowAboutModal] = useState(false);
   const [, setRelativeTimeTick] = useState(0);
   const syncingRef = useRef(false);
   const lastSyncFinishedAtRef = useRef(0);
+  const menuButtonRef = useRef<HTMLButtonElement | null>(null);
   const configureSession = useAudioSessionConfig();
+  const { clearPreviousJuzCaches } = useAudioPlayer();
 
   // Register PWA Service Worker
   useEffect(() => {
@@ -106,6 +123,7 @@ export default function HomePage() {
       reciterId: activeChild.preferredReciterId || 'al_husary',
       childId: activeChild.id,
       cycleMonth: cycle.currentMonth,
+      lastPlayback: activeChild.lastPlayback,
     });
   }, [
     activeChild,
@@ -130,10 +148,52 @@ export default function HomePage() {
     notifyLocalDataMutated();
   };
 
+  const handleSelectReciter = async (reciterId: string, isProReciter: boolean) => {
+    if (isProReciter && !settings.isProUser) {
+      setShowInfaqModal(true);
+      return;
+    }
+    if (!activeChild) return;
+    await db.children.update(activeChild.id, {
+      preferredReciterId: reciterId,
+      updatedAt: new Date().toISOString(),
+    });
+    notifyLocalDataMutated();
+  };
+
+  const handleCleanOldCache = async () => {
+    const count = await clearPreviousJuzCaches();
+    alert(
+      count > 0
+        ? `${count} cache audio Juz bulan sebelumnya berhasil dibersihkan.`
+        : 'Penyimpanan audio offline sudah bersih.'
+    );
+  };
+
+  // Launch onboarding guide for first-time user
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (activeChild && !localStorage.getItem('talaqids_tour_seen')) {
+      const timer = setTimeout(() => {
+        setIsGuideOpen(true);
+      }, 900);
+      return () => clearTimeout(timer);
+    }
+  }, [activeChild]);
+
+  const handleCloseGuide = () => {
+    setIsGuideOpen(false);
+    try {
+      localStorage.setItem('talaqids_tour_seen', 'true');
+    } catch {
+      // ignore storage error
+    }
+  };
+
   const triggerCloudSync = useCallback(async (interactive: boolean) => {
     if (!settings.isProUser) {
       if (interactive) {
-        setActiveTab('infaq');
+        setShowInfaqModal(true);
       }
       return;
     }
@@ -247,7 +307,11 @@ export default function HomePage() {
 
       {/* Top App Bar */}
       <header className="sticky top-0 z-30 w-full border-b border-[#1E4C40]/8 bg-[#F6F0E4]/80 backdrop-blur-xl">
-        <div className="mx-auto flex w-full max-w-lg items-center justify-between gap-3 px-4 py-3">
+        <div
+          className={`mx-auto flex w-full items-center justify-between gap-3 px-4 py-3 transition-all duration-300 ${
+            activeTab === 'mushaf' ? 'max-w-4xl' : 'max-w-lg'
+          }`}
+        >
           <Image
             src="/logo-wordmark.png"
             alt="talaQids"
@@ -258,96 +322,113 @@ export default function HomePage() {
           />
 
           {activeChild && (
-            <div className="flex min-w-0 items-center gap-1.5">
+            <div
+              data-guide="header-actions"
+              className="flex min-w-0 items-center gap-1 sm:gap-1.5"
+            >
               <button
                 type="button"
-                onClick={() => void triggerCloudSync(true)}
+                onClick={() => {
+                  if (!settings.isProUser) {
+                    setShowInfaqModal(true);
+                  } else {
+                    void triggerCloudSync(true);
+                  }
+                }}
                 disabled={isSyncingCloud}
                 title={
                   !settings.isProUser
-                    ? 'Fitur sinkronisasi khusus Tier Muhsinin — klik untuk membuka'
+                    ? 'Sinkronisasi Google Drive (Fitur Muhsinin)'
                     : settings.googleDriveLastSyncedAt
                       ? `Terakhir sinkron: ${formatRelativeSyncTime(settings.googleDriveLastSyncedAt)}`
-                      : 'Sinkronkan ke Google Drive (HP Ayah & Ibu)'
+                      : 'Sinkronkan ke Google Drive'
                 }
-                className={`flex min-h-[38px] shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-left shadow-[0_10px_24px_-18px_rgba(16,46,39,0.8)] transition active:scale-[0.99] disabled:opacity-65 ${
-                  settings.isProUser
-                    ? 'border-[#1E4C40]/10 bg-[#FFFCF5]/90 hover:border-[#2F6B5B]/40'
-                    : 'border-[#C89B4E]/30 bg-[#FBF6EC]/80 opacity-80 hover:border-[#C89B4E]/50'
-                }`}
+                aria-label="Sinkronisasi Google Drive"
+                className="relative flex h-9 w-9 shrink-0 items-center justify-center text-[#1E4C40] transition hover:text-[#C89B4E] active:scale-90 disabled:opacity-60"
               >
+                <GoogleDriveIcon className="h-[21px] w-[21px] shrink-0" />
                 {!settings.isProUser ? (
-                  <Lock className="h-3.5 w-3.5 shrink-0 text-[#9C7330]" />
+                  <span className="absolute bottom-0 right-0 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#C89B4E] text-[#15231E] shadow-xs ring-1.5 ring-[#F6F0E4]">
+                    <Lock className="h-2 w-2 stroke-[2.8]" />
+                  </span>
                 ) : isSyncingCloud ? (
-                  <RefreshCw className="h-3.5 w-3.5 shrink-0 animate-spin text-[#1E4C40]" />
-                ) : (
-                  <Cloud
-                    className={`h-3.5 w-3.5 shrink-0 ${
-                      settings.googleDriveLastSyncedAt ? 'text-[#2F6B5B]' : 'text-[#8A968F]'
-                    }`}
-                  />
-                )}
-                <div className="leading-tight">
-                  <p className="text-[9.5px] font-extrabold text-[#15231E]">Sinkronkan</p>
-                  <p
-                    className={`text-[8px] font-semibold ${
-                      !settings.isProUser ? 'font-extrabold text-[#9C7330]' : 'text-[#6B7A72]'
-                    }`}
-                  >
-                    {!settings.isProUser
-                      ? 'Muhsinin'
-                      : isSyncingCloud
-                        ? 'Menyinkronkan...'
-                        : settings.googleDriveLastSyncedAt
-                          ? formatRelativeSyncTime(settings.googleDriveLastSyncedAt)
-                          : 'Google Drive'}
-                  </p>
-                </div>
+                  <span className="absolute bottom-0 right-0 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#1E4C40] text-[#F3E7CB] shadow-xs ring-1.5 ring-[#F6F0E4]">
+                    <RefreshCw className="h-2 w-2 animate-spin stroke-[2.8]" />
+                  </span>
+                ) : settings.googleDriveLastSyncedAt ? (
+                  <span className="absolute bottom-0.5 right-0.5 h-2 w-2 rounded-full bg-[#2F6B5B] ring-1.5 ring-[#F6F0E4]" />
+                ) : null}
               </button>
 
               <button
                 type="button"
-                onClick={() => setActiveTab('infaq')}
-                aria-current={activeTab === 'infaq' ? 'page' : undefined}
-                className={`flex min-h-[38px] min-w-0 items-center gap-2 rounded-full border py-1 pl-1 pr-2.5 text-left shadow-[0_10px_24px_-18px_rgba(16,46,39,0.8)] transition active:scale-[0.99] ${
-                  activeTab === 'infaq'
-                    ? 'border-[#C89B4E] bg-[#1E4C40] text-[#F3E7CB]'
-                    : 'border-[#1E4C40]/10 bg-[#FFFCF5]/90 hover:border-[#C89B4E]/40'
+                onClick={() => setShowInfaqModal(true)}
+                title={
+                  settings.isProUser
+                    ? 'Status Muhsinin Aktif • Barakallahu fiikum'
+                    : 'Infaq & Dukung talaQids'
+                }
+                aria-label="Infaq & Muhsinin"
+                className={`relative flex h-9 w-9 shrink-0 items-center justify-center transition active:scale-90 ${
+                  settings.isProUser
+                    ? 'text-[#C89B4E] hover:text-[#8A6220]'
+                    : 'text-[#1E4C40] hover:text-[#C89B4E]'
                 }`}
               >
-                <span
-                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-extrabold ${
-                    activeTab === 'infaq'
-                      ? 'bg-[#C89B4E] text-[#15231E]'
-                      : 'bg-[#1E4C40] text-[#F3E7CB]'
-                  }`}
-                >
-                  {activeChild.name.charAt(0).toUpperCase()}
-                </span>
-                <span
-                  className={`max-w-[78px] truncate text-[11px] font-extrabold ${
-                    activeTab === 'infaq' ? 'text-[#F3E7CB]' : 'text-[#15231E]'
-                  }`}
-                >
-                  {activeChild.name}
-                </span>
-                {settings.isProUser ? (
-                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#C89B4E]" />
-                ) : (
-                  <ChevronDown
-                    className={`h-3.5 w-3.5 shrink-0 ${
-                      activeTab === 'infaq' ? 'text-[#EAD8AF]' : 'text-[#8A968F]'
-                    }`}
-                  />
+                <HeartHandshake className="h-[22px] w-[22px] shrink-0 stroke-[2.2]" />
+                {settings.isProUser && (
+                  <span className="absolute bottom-0.5 right-0.5 h-2 w-2 rounded-full bg-[#C89B4E] ring-1.5 ring-[#F6F0E4]" />
                 )}
               </button>
+
+              <div className="relative">
+                <button
+                  ref={menuButtonRef}
+                  type="button"
+                  onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
+                  aria-expanded={isProfileDropdownOpen}
+                  aria-haspopup="menu"
+                  title="Menu Aplikasi"
+                  aria-label="Menu Aplikasi"
+                  className={`relative flex h-9 w-9 shrink-0 items-center justify-center transition active:scale-90 ${
+                    isProfileDropdownOpen
+                      ? 'text-[#C89B4E]'
+                      : 'text-[#1E4C40] hover:text-[#C89B4E]'
+                  }`}
+                >
+                  <Menu className="h-[22px] w-[22px] shrink-0 stroke-[2.2]" />
+                </button>
+
+                <ProfileDropdown
+                  isOpen={isProfileDropdownOpen}
+                  onClose={() => setIsProfileDropdownOpen(false)}
+                  triggerRef={menuButtonRef}
+                  activeChild={activeChild}
+                  childrenList={childrenList ?? []}
+                  isProUser={settings.isProUser}
+                  onSelectChild={(id) => void handleSelectChild(id)}
+                  onOpenManageChildren={() => setShowManageChildrenModal(true)}
+                  onOpenReciters={() => setShowRecitersModal(true)}
+                  onOpenInfaq={() => setShowInfaqModal(true)}
+                  onOpenGoogleDrive={() => setShowDriveModal(true)}
+                  onOpenGuide={() => setIsGuideOpen(true)}
+                  onOpenAbout={() => setShowAboutModal(true)}
+                  onClearCache={() => void handleCleanOldCache()}
+                />
+              </div>
             </div>
           )}
         </div>
       </header>
 
-      {/* Main Content Container (Mobile-First Fluid Max-Width) */}
-      <main className="relative z-10 mx-auto w-full max-w-lg flex-1 px-4 pb-36 pt-3">
+      {/* Main Content Container (Fluid full-width for Mushaf view, compact for other tabs) */}
+      <main
+        className={`relative z-10 mx-auto w-full flex-1 pb-36 pt-3 transition-all duration-300 ${
+          activeTab === 'mushaf'
+            ? 'max-w-4xl px-2 sm:px-4 md:px-6'
+            : 'max-w-lg px-4'
+        }`}
+      >
         <PwaInstallBanner />
         {activeChild && cycle && (
           <>
@@ -360,7 +441,7 @@ export default function HomePage() {
                 isPro={settings.isProUser}
                 onOpenMushaf={() => setActiveTab('mushaf')}
                 onOverrideJuz={(j) => void handleOverrideJuz(j)}
-                onOpenInfaq={() => setActiveTab('infaq')}
+                onOpenInfaq={() => setShowInfaqModal(true)}
                 onOpenPlayer={() => setIsPlayerOpen(true)}
               />
             )}
@@ -383,19 +464,6 @@ export default function HomePage() {
                 onOpenAudio={() => setActiveTab('audio')}
               />
             )}
-
-            {activeTab === 'infaq' && (
-              <InfaqSettingsView
-                settings={settings}
-                childrenList={childrenList}
-                activeChild={activeChild}
-                onSelectChild={(id) => void handleSelectChild(id)}
-                onAddChildClick={() => setShowAddChildModal(true)}
-                isSyncingCloud={isSyncingCloud}
-                cloudError={cloudError}
-                onManualSyncCloud={() => triggerCloudSync(true)}
-              />
-            )}
           </>
         )}
       </main>
@@ -413,15 +481,21 @@ export default function HomePage() {
       {/* Unified Floating Dock: mini player + bottom navigation in one cohesive capsule */}
       {activeChild && (
         <div
-          className={`pointer-events-none fixed inset-x-0 bottom-0 z-40 mx-auto w-full max-w-lg px-3 pb-[max(0.65rem,env(safe-area-inset-bottom))] transition-all duration-300 ease-out ${
+          className={`pointer-events-none fixed inset-x-0 bottom-0 z-40 mx-auto w-full px-3 pb-[max(0.65rem,env(safe-area-inset-bottom))] transition-all duration-300 ease-out ${
+            activeTab === 'mushaf' ? 'max-w-xl' : 'max-w-lg'
+          } ${
             isPlayerOpen ? 'translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'
           }`}
           aria-hidden={isPlayerOpen}
         >
-          <div className="pointer-events-auto overflow-hidden rounded-[22px] border border-white/85 bg-gradient-to-b from-[#FFFCF5]/80 via-[#FFFCF5]/60 to-[#F6F0E4]/15 shadow-[0_20px_45px_-18px_rgba(16,46,39,0.35),inset_0_1.5px_1px_rgba(255,255,255,0.95)] backdrop-blur-2xl backdrop-saturate-150">
+          <div
+            data-guide="now-playing-dock"
+            className="pointer-events-auto overflow-hidden rounded-[22px] border border-white/85 bg-gradient-to-b from-[#FFFCF5]/80 via-[#FFFCF5]/60 to-[#F6F0E4]/15 shadow-[0_20px_45px_-18px_rgba(16,46,39,0.35),inset_0_1.5px_1px_rgba(255,255,255,0.95)] backdrop-blur-2xl backdrop-saturate-150"
+          >
             <NowPlayingBar isPro={settings.isProUser} onExpand={() => setIsPlayerOpen(true)} />
 
             <nav
+              data-guide="nav-tabs"
               aria-label="Navigasi utama"
               className="border-t border-[#1E4C40]/6 px-1.5 py-1"
             >
@@ -457,8 +531,66 @@ export default function HomePage() {
         isPro={settings.isProUser}
         onClose={() => setIsPlayerOpen(false)}
         onOpenMushaf={() => setActiveTab('mushaf')}
-        onOpenInfaq={() => setActiveTab('infaq')}
+        onOpenInfaq={() => setShowInfaqModal(true)}
       />
+
+      {/* Profile Modals */}
+      {activeChild && (
+        <>
+          <ManageChildrenModal
+            isOpen={showManageChildrenModal}
+            onClose={() => setShowManageChildrenModal(false)}
+            childrenList={childrenList ?? []}
+            activeChild={activeChild}
+            onSelectChild={(id) => void handleSelectChild(id)}
+            onAddChildClick={() => setShowAddChildModal(true)}
+          />
+
+          <RecitersModal
+            isOpen={showRecitersModal}
+            onClose={() => setShowRecitersModal(false)}
+            activeReciterId={activeChild.preferredReciterId || 'husary'}
+            isProUser={settings.isProUser}
+            onSelectReciter={(id, isPro) => void handleSelectReciter(id, isPro)}
+            onUnlockRequest={() => setShowInfaqModal(true)}
+          />
+
+          <InfaqModal
+            isOpen={showInfaqModal}
+            onClose={() => setShowInfaqModal(false)}
+            isProUser={settings.isProUser}
+            activeChildName={activeChild.name}
+          />
+
+          <GoogleDriveSyncModal
+            isOpen={showDriveModal}
+            onClose={() => setShowDriveModal(false)}
+            isProUser={settings.isProUser}
+            isSyncing={isSyncingCloud}
+            lastSyncedAt={settings.googleDriveLastSyncedAt}
+            error={cloudError}
+            onManualSync={() => triggerCloudSync(true)}
+            onDisconnect={async () => {
+              await disconnectGoogleDrive();
+              notifyLocalDataMutated();
+            }}
+            onUnlockRequest={() => setShowInfaqModal(true)}
+          />
+
+          <OnboardingGuide
+            isOpen={isGuideOpen}
+            onClose={handleCloseGuide}
+            currentTab={activeTab}
+            onNavigateTab={(tab) => setActiveTab(tab)}
+          />
+
+          <AboutModal
+            isOpen={showAboutModal}
+            onClose={() => setShowAboutModal(false)}
+            onOpenInfaq={() => setShowInfaqModal(true)}
+          />
+        </>
+      )}
     </div>
   );
 }
