@@ -181,8 +181,8 @@ export function InfaqSettingsView({
 
         <div className="relative mt-4 flex flex-wrap gap-1.5">
           {(settings.isProUser
-            ? ['30 Juz terbuka', 'Tanpa iklan', 'Audio offline aktif', 'Sinkronisasi Cloud']
-            : ['30 Juz terbuka', 'Tanpa iklan', 'Streaming online']
+            ? ['30 Juz terbuka', 'Tanpa iklan', 'Audio offline aktif', 'Sinkronisasi Cloud', 'Pilihan Mushaf']
+            : ['30 Juz terbuka', 'Tanpa iklan', 'Streaming online', 'Mushaf Madinah']
           ).map((item) => (
             <span
               key={item}

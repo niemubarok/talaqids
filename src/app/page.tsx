@@ -466,6 +466,7 @@ export default function HomePage() {
                 progressToday={progressToday}
                 allProgress={allChildProgress}
                 isPro={settings.isProUser}
+                onOpenInfaq={() => setShowInfaqModal(true)}
               />
             )}
 

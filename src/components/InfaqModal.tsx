@@ -222,7 +222,7 @@ export function InfaqModal({
               }`}
             >
               Seluruh 30 Juz terbuka bebas iklan. Infaq sukarela Anda mendukung operasional server dan
-              membuka sinkronisasi cloud Google Drive &amp; seluruh qari pilihan.
+              membuka sinkronisasi cloud Google Drive, pilihan edisi mushaf &amp; seluruh qari pilihan.
             </p>
           </div>
 

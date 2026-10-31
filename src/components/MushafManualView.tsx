@@ -8,9 +8,11 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Crown,
   Headphones,
   Languages,
   Loader2,
+  Lock,
   Sparkles,
   Users,
   Volume2,
@@ -32,6 +34,7 @@ interface MushafManualViewProps {
   progressToday: DailyProgress | undefined;
   allProgress: DailyProgress[];
   isPro: boolean;
+  onOpenInfaq?: () => void;
 }
 
 export function MushafManualView({
@@ -40,6 +43,7 @@ export function MushafManualView({
   progressToday,
   allProgress,
   isPro,
+  onOpenInfaq,
 }: MushafManualViewProps) {
   const {
     state: audioState,
@@ -72,7 +76,7 @@ export function MushafManualView({
   const [quranSource, setQuranSource] = useState<QuranSourceEdition>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('talaqids_quran_source');
-      if (saved && QURAN_SOURCES.some((s) => s.id === saved)) {
+      if (isPro && saved && QURAN_SOURCES.some((s) => s.id === saved)) {
         return saved as QuranSourceEdition;
       }
     }
@@ -80,6 +84,13 @@ export function MushafManualView({
   });
   const [isSourceMenuOpen, setIsSourceMenuOpen] = useState(false);
   const sourceSelectorRef = useRef<HTMLDivElement>(null);
+
+  // Revert back to default Uthmani if user is not Pro
+  useEffect(() => {
+    if (!isPro && quranSource !== 'quran-uthmani') {
+      setQuranSource('quran-uthmani');
+    }
+  }, [isPro, quranSource]);
 
   useEffect(() => {
     function handleClickOutsideSource(event: MouseEvent) {
@@ -96,6 +107,11 @@ export function MushafManualView({
   }, [isSourceMenuOpen]);
 
   const handleChangeSource = (newSource: QuranSourceEdition) => {
+    if (!isPro && newSource !== 'quran-uthmani') {
+      setIsSourceMenuOpen(false);
+      onOpenInfaq?.();
+      return;
+    }
     setQuranSource(newSource);
     setIsSourceMenuOpen(false);
     if (typeof window !== 'undefined') {
@@ -422,14 +438,17 @@ export function MushafManualView({
                 type="button"
                 onClick={() => setIsSourceMenuOpen((prev) => !prev)}
                 aria-expanded={isSourceMenuOpen}
-                title={`Sumber: ${currentSourceMeta.name} (klik untuk ganti sumber)`}
-                className={`inline-flex h-7 items-center gap-1 rounded-full border px-2 text-[10px] font-extrabold transition-all active:scale-95 ${
+                title={`Sumber: ${currentSourceMeta.name} ${!isPro ? '(Pilihan edisi khusus Tier Muhsinin)' : '(klik untuk ganti sumber)'}`}
+                className={`inline-flex h-7 items-center gap-1.5 rounded-full border px-2 text-[10px] font-extrabold transition-all active:scale-95 ${
                   isSourceMenuOpen
                     ? 'border-[#C89B4E] bg-[#C89B4E] text-[#15231E] shadow-xs'
                     : 'border-[#1E4C40]/12 bg-white text-[#1E4C40] hover:border-[#1E4C40]/30 shadow-2xs'
                 }`}
               >
                 <span className="max-w-[85px] sm:max-w-none truncate">{currentSourceMeta.badge}</span>
+                {!isPro && (
+                  <Crown className="h-2.5 w-2.5 text-[#C89B4E]" />
+                )}
                 <ChevronDown
                   className={`h-3 w-3 text-[#6B7A72] transition-transform duration-200 ${
                     isSourceMenuOpen ? 'rotate-180 text-inherit' : ''
@@ -443,21 +462,42 @@ export function MushafManualView({
                     <span className="text-[10.5px] font-extrabold text-[#1E4C40]">
                       Pilihan Sumber Mushaf
                     </span>
-                    <span className="text-[9px] text-[#8A968F]">{QURAN_SOURCES.length} Sumber</span>
+                    {isPro ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-[#C89B4E]/20 px-2 py-0.5 text-[8.5px] font-extrabold text-[#8A6220]">
+                        <Crown className="h-2.5 w-2.5 text-[#8A6220]" />
+                        Tier Muhsinin
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-[#C89B4E]/15 px-2 py-0.5 text-[8.5px] font-extrabold text-[#9C7330]">
+                        <Crown className="h-2.5 w-2.5" />
+                        Khusus Muhsinin
+                      </span>
+                    )}
                   </div>
 
                   <div className="space-y-1 max-h-64 overflow-y-auto pr-0.5">
                     {QURAN_SOURCES.map((s) => {
                       const isSelected = s.id === quranSource;
+                      const isLocked = !isPro && s.id !== 'quran-uthmani';
+
                       return (
                         <button
                           key={s.id}
                           type="button"
-                          onClick={() => handleChangeSource(s.id)}
+                          onClick={() => {
+                            if (isLocked) {
+                              setIsSourceMenuOpen(false);
+                              onOpenInfaq?.();
+                              return;
+                            }
+                            handleChangeSource(s.id);
+                          }}
                           className={`flex w-full items-start justify-between rounded-xl p-2 text-left transition ${
                             isSelected
                               ? 'bg-[#1E4C40] text-[#F3E7CB] shadow-xs'
-                              : 'text-[#15231E] hover:bg-[#1E4C40]/6'
+                              : isLocked
+                                ? 'text-[#15231E]/70 hover:bg-[#C89B4E]/10'
+                                : 'text-[#15231E] hover:bg-[#1E4C40]/6'
                           }`}
                         >
                           <div className="min-w-0 pr-2">
@@ -465,6 +505,12 @@ export function MushafManualView({
                               <span className="text-[11px] font-extrabold leading-tight">
                                 {s.name}
                               </span>
+                              {isLocked && (
+                                <span className="inline-flex items-center gap-0.5 rounded-full bg-[#C89B4E]/20 px-1.5 py-0.5 text-[8px] font-extrabold text-[#8A6220]">
+                                  <Lock className="h-2 w-2" />
+                                  Muhsinin
+                                </span>
+                              )}
                             </div>
                             <p
                               className={`mt-0.5 text-[9px] leading-relaxed ${
@@ -474,13 +520,43 @@ export function MushafManualView({
                               {s.description}
                             </p>
                           </div>
-                          {isSelected && (
+                          {isSelected ? (
                             <CheckCircle2 className="h-4 w-4 shrink-0 text-[#C89B4E] mt-0.5" />
-                          )}
+                          ) : isLocked ? (
+                            <Lock className="h-3.5 w-3.5 shrink-0 text-[#C89B4E] mt-0.5" />
+                          ) : null}
                         </button>
                       );
                     })}
                   </div>
+
+                  {!isPro && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsSourceMenuOpen(false);
+                        onOpenInfaq?.();
+                      }}
+                      className="mt-2.5 flex w-full items-center justify-between gap-2 rounded-xl bg-gradient-to-r from-[#1E4C40] to-[#15342C] p-2 text-left text-white shadow-xs transition hover:brightness-110 active:scale-[0.99]"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-[#C89B4E]/20 text-[#EAD8AF]">
+                          <Crown className="h-3.5 w-3.5 text-[#EAD8AF]" />
+                        </span>
+                        <div className="min-w-0">
+                          <p className="text-[10px] font-extrabold text-[#F7EFD9] leading-tight">
+                            Buka Semua Pilihan Mushaf
+                          </p>
+                          <p className="truncate text-[8.5px] text-[#EAD8AF]/80 leading-tight">
+                            Aktifkan Tier Muhsinin lewat infaq sukarela
+                          </p>
+                        </div>
+                      </div>
+                      <span className="shrink-0 rounded-full bg-[#C89B4E] px-2 py-0.5 text-[8.5px] font-extrabold text-[#15231E]">
+                        Buka
+                      </span>
+                    </button>
+                  )}
                 </div>
               )}
             </div>
