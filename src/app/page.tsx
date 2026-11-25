@@ -36,6 +36,7 @@ import { RecitersModal } from '@/components/RecitersModal';
 import { InfaqModal } from '@/components/InfaqModal';
 import { GoogleDriveSyncModal } from '@/components/GoogleDriveSyncModal';
 import { AboutModal } from '@/components/AboutModal';
+import { ShareProgressModal } from '@/components/ShareProgressModal';
 
 type ActiveTab = 'audio' | 'mushaf' | 'insights';
 
@@ -58,6 +59,7 @@ export default function HomePage() {
   const [showInfaqModal, setShowInfaqModal] = useState(false);
   const [showDriveModal, setShowDriveModal] = useState(false);
   const [showAboutModal, setShowAboutModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [, setRelativeTimeTick] = useState(0);
   const syncingRef = useRef(false);
   const lastSyncFinishedAtRef = useRef(0);
@@ -436,6 +438,7 @@ export default function HomePage() {
                 onOverrideJuz={(j) => void handleOverrideJuz(j)}
                 onOpenInfaq={() => setShowInfaqModal(true)}
                 onOpenPlayer={() => setIsPlayerOpen(true)}
+                onOpenShare={() => setShowShareModal(true)}
               />
             )}
 
@@ -461,6 +464,24 @@ export default function HomePage() {
           </>
         )}
       </main>
+
+      <footer className="mx-auto max-w-lg px-4 pb-6 pt-2 text-center text-[11px] text-[#6B7A72]">
+        <div className="flex items-center justify-center gap-3">
+          <a
+            href="/privacy"
+            className="font-medium text-[#1E4C40]/80 underline decoration-[#C89B4E]/40 underline-offset-2 transition hover:text-[#1E4C40]"
+          >
+            Kebijakan Privasi
+          </a>
+          <span aria-hidden="true">&bull;</span>
+          <a
+            href="/terms"
+            className="font-medium text-[#1E4C40]/80 underline decoration-[#C89B4E]/40 underline-offset-2 transition hover:text-[#1E4C40]"
+          >
+            Syarat &amp; Ketentuan
+          </a>
+        </div>
+      </footer>
 
       {(!activeChild || !cycle) && <OnboardingModal onCompleted={() => {}} />}
 
@@ -580,6 +601,16 @@ export default function HomePage() {
             onClose={() => setShowAboutModal(false)}
             onOpenInfaq={() => setShowInfaqModal(true)}
           />
+
+          {cycle && (
+            <ShareProgressModal
+              isOpen={showShareModal}
+              onClose={() => setShowShareModal(false)}
+              child={activeChild}
+              cycle={cycle}
+              allProgress={allChildProgress}
+            />
+          )}
         </>
       )}
     </div>

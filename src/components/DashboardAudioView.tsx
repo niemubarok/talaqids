@@ -13,6 +13,7 @@ import {
   Pause,
   Play,
   Repeat,
+  Share2,
   Shield,
   Sliders,
   Sparkles,
@@ -38,6 +39,7 @@ interface DashboardAudioViewProps {
   onOverrideJuz: (newJuz: number | null) => void;
   onOpenInfaq: () => void;
   onOpenPlayer: () => void;
+  onOpenShare: () => void;
 }
 
 export function DashboardAudioView({
@@ -50,6 +52,7 @@ export function DashboardAudioView({
   onOverrideJuz,
   onOpenInfaq,
   onOpenPlayer,
+  onOpenShare,
 }: DashboardAudioViewProps) {
   const { state, restartFromBeginning, togglePlay } = useAudioPlayer();
 
@@ -97,9 +100,17 @@ export function DashboardAudioView({
             <span className="h-1.5 w-1.5 rounded-full bg-[#EAD8AF]" />
             Bulan {cycle.currentMonth} · Hari {cycle.dayInCurrentCycle}/30
           </div>
-          <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.14em] text-[#F0DDB4] ring-1 ring-white/15">
-            Bebas Iklan
-          </span>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={onOpenShare}
+              className="inline-flex items-center gap-1.5 rounded-full bg-[#E4C486] px-2.5 py-1 text-[10px] font-extrabold text-[#15231E] shadow-xs transition hover:bg-[#EAD8AF] active:scale-95"
+              aria-label="Bagikan progres ke media sosial"
+            >
+              <Share2 className="h-3 w-3" />
+              <span>Bagikan</span>
+            </button>
+          </div>
         </div>
 
         <div className="relative mt-4 flex items-end justify-between gap-4">
@@ -484,6 +495,15 @@ export function DashboardAudioView({
             <span className="h-2 w-2 rounded-sm bg-[#E5DEC9]" /> Berikutnya ({Math.max(0, 30 - cycle.currentMonth)} Juz)
           </span>
         </div>
+
+        <button
+          type="button"
+          onClick={onOpenShare}
+          className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#1E4C40]/15 bg-[#1E4C40]/5 py-2 text-[11px] font-extrabold text-[#1E4C40] transition hover:bg-[#1E4C40]/10 active:scale-[0.99]"
+        >
+          <Share2 className="h-3.5 w-3.5" />
+          <span>Bagikan Progres ke Medsos</span>
+        </button>
       </section>
 
       {/* ── Phase note ──────────────────────────────────────────────── */}
