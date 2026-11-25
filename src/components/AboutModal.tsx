@@ -170,6 +170,23 @@ export function AboutModal({ isOpen, onClose, onOpenInfaq }: AboutModalProps) {
               fitur sinkronisasi diaktifkan, data dicadangkan langsung ke Google Drive pribadi Anda
               tanpa melalui perantara server pihak ketiga.
             </p>
+            <div className="flex items-center gap-3 pt-1 text-[10.5px] font-bold text-[#1E4C40]">
+              <a
+                href="/privacy"
+                className="underline decoration-[#C89B4E]/60 underline-offset-2 hover:text-[#0F2C25]"
+              >
+                Kebijakan Privasi
+              </a>
+              <span aria-hidden="true" className="text-[#6B7A72]">
+                &bull;
+              </span>
+              <a
+                href="/terms"
+                className="underline decoration-[#C89B4E]/60 underline-offset-2 hover:text-[#0F2C25]"
+              >
+                Syarat &amp; Ketentuan
+              </a>
+            </div>
           </div>
 
           {/* Dukungan Dakwah / Infaq Footer */}

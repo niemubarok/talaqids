@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { BookOpen, ChevronDown, HeartHandshake, LayoutDashboard, Lock, Menu, RefreshCw, Sparkles } from 'lucide-react';
 import {
@@ -463,25 +464,25 @@ export default function HomePage() {
             )}
           </>
         )}
-      </main>
 
-      <footer className="mx-auto max-w-lg px-4 pb-6 pt-2 text-center text-[11px] text-[#6B7A72]">
-        <div className="flex items-center justify-center gap-3">
-          <a
-            href="/privacy"
-            className="font-medium text-[#1E4C40]/80 underline decoration-[#C89B4E]/40 underline-offset-2 transition hover:text-[#1E4C40]"
-          >
-            Kebijakan Privasi
-          </a>
-          <span aria-hidden="true">&bull;</span>
-          <a
-            href="/terms"
-            className="font-medium text-[#1E4C40]/80 underline decoration-[#C89B4E]/40 underline-offset-2 transition hover:text-[#1E4C40]"
-          >
-            Syarat &amp; Ketentuan
-          </a>
-        </div>
-      </footer>
+        <footer className="mt-6 pb-2 text-center text-[11px] text-[#6B7A72]">
+          <div className="flex items-center justify-center gap-3">
+            <Link
+              href="/privacy"
+              className="font-medium text-[#1E4C40]/80 underline decoration-[#C89B4E]/40 underline-offset-2 transition hover:text-[#1E4C40]"
+            >
+              Kebijakan Privasi
+            </Link>
+            <span aria-hidden="true">&bull;</span>
+            <Link
+              href="/terms"
+              className="font-medium text-[#1E4C40]/80 underline decoration-[#C89B4E]/40 underline-offset-2 transition hover:text-[#1E4C40]"
+            >
+              Syarat &amp; Ketentuan
+            </Link>
+          </div>
+        </footer>
+      </main>
 
       {(!activeChild || !cycle) && <OnboardingModal onCompleted={() => {}} />}
 
