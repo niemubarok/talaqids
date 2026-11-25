@@ -65,7 +65,6 @@ export function ReciterProfileModal({
   if (!mounted || !viewedReciter) return null;
 
   const isSelected = activeReciterId === viewedReciter.id;
-  const isLocked = viewedReciter.isPro && !isProUser;
 
   const modalContent = (
     <div
@@ -195,15 +194,9 @@ export function ReciterProfileModal({
                 </p>
               </div>
             </div>
-            {viewedReciter.isPro ? (
-              <span className="rounded-full bg-[#C89B4E]/18 px-2.5 py-0.5 text-[9.5px] font-extrabold text-[#9C7330]">
-                Qari Muhsinin
-              </span>
-            ) : (
-              <span className="rounded-full bg-[#2F6B5B]/15 px-2.5 py-0.5 text-[9.5px] font-extrabold text-[#1E4C40]">
-                Qari Utama (Gratis)
-              </span>
-            )}
+            <span className="rounded-full bg-[#2F6B5B]/15 px-2.5 py-0.5 text-[9.5px] font-extrabold text-[#1E4C40]">
+              Qari Talaqqi
+            </span>
           </div>
 
           {/* Biografi Singkat */}
@@ -254,18 +247,6 @@ export function ReciterProfileModal({
                 <Check className="h-4 w-4" />
                 Qari Aktif Saat Ini
               </div>
-            ) : isLocked ? (
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  onUnlockRequest?.();
-                }}
-                className="flex min-h-[46px] w-full items-center justify-center gap-2 rounded-2xl gold-gradient px-4 py-2.5 text-xs font-extrabold text-[#12211C] shadow-sm transition active:scale-[0.99]"
-              >
-                <Lock className="h-3.5 w-3.5" />
-                Aktifkan Apresiasi Muhsinin untuk Memilih Qari Ini
-              </button>
             ) : onSelectReciter ? (
               <button
                 type="button"

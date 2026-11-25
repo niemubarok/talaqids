@@ -627,9 +627,6 @@ export async function syncWithGoogleDrive(options?: {
         'Belum ada data backup talaQids yang ditemukan di Google Drive akun ini.'
       );
     }
-    if (!settings.isProUser) {
-      throw new Error('Fitur sinkronisasi Google Drive khusus untuk Tier Muhsinin.');
-    }
   }
 
   let finalPayload = localPayload;
@@ -640,17 +637,8 @@ export async function syncWithGoogleDrive(options?: {
     }
   }
 
-  // Check Pro / Muhsinin entitlement after reading cloud payload (cloud might already be Muhsinin)
-  const isEntitledPro = Boolean(settings.isProUser || finalPayload.settings?.isProUser);
-  if (!isEntitledPro && !allowRestore) {
-    throw new Error('Fitur sinkronisasi Google Drive khusus untuk Tier Muhsinin.');
-  }
-
-  // Upload back merged data only if user is Muhsinin or in regular sync mode
-  let fileId = remoteFile?.id || '';
-  if (isEntitledPro || !remoteFile) {
-    fileId = await uploadAppDataFile(accessToken, finalPayload, remoteFile?.id);
-  }
+  // Upload merged data
+  const fileId = await uploadAppDataFile(accessToken, finalPayload, remoteFile?.id);
 
   const syncedAt = new Date().toISOString();
 

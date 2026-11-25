@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Check, Info, Lock, Volume2, X } from 'lucide-react';
+import { Check, Info, Volume2, X } from 'lucide-react';
 import { RECITERS, type Reciter } from '@/lib/quran-metadata';
 import { ReciterProfileModal } from '@/components/ReciterProfileModal';
 
@@ -10,18 +10,14 @@ interface RecitersModalProps {
   isOpen: boolean;
   onClose: () => void;
   activeReciterId: string;
-  isProUser: boolean;
-  onSelectReciter: (reciterId: string, isPro: boolean) => void;
-  onUnlockRequest?: () => void;
+  onSelectReciter: (reciterId: string) => void;
 }
 
 export function RecitersModal({
   isOpen,
   onClose,
   activeReciterId,
-  isProUser,
   onSelectReciter,
-  onUnlockRequest,
 }: RecitersModalProps) {
   const [selectedProfileReciter, setSelectedProfileReciter] = useState<Reciter | null>(null);
 
@@ -63,7 +59,6 @@ export function RecitersModal({
         <div className="max-h-[70vh] space-y-2.5 overflow-y-auto p-5">
           {RECITERS.map((reciter) => {
             const isSelected = activeReciterId === reciter.id;
-            const locked = reciter.isPro && !isProUser;
 
             return (
               <div
@@ -71,19 +66,13 @@ export function RecitersModal({
                 className={`flex items-center justify-between gap-3 rounded-2xl border p-3 transition ${
                   isSelected
                     ? 'border-[#C89B4E] bg-gradient-to-r from-[#FFF8ED] to-[#FBF6EC] shadow-xs ring-1 ring-[#C89B4E]/30'
-                    : locked
-                      ? 'border-[#1E4C40]/8 bg-[#FBF6EC]/50 opacity-75'
-                      : 'border-[#1E4C40]/8 bg-[#FFFCF5] hover:bg-[#FBF6EC]'
+                    : 'border-[#1E4C40]/8 bg-[#FFFCF5] hover:bg-[#FBF6EC]'
                 }`}
               >
                 <button
                   type="button"
                   onClick={() => {
-                    if (locked) {
-                      setSelectedProfileReciter(reciter);
-                      return;
-                    }
-                    onSelectReciter(reciter.id, reciter.isPro);
+                    onSelectReciter(reciter.id);
                     onClose();
                   }}
                   className="flex min-w-0 flex-1 items-center gap-3 text-left"
@@ -124,20 +113,11 @@ export function RecitersModal({
                     <span>Profil</span>
                   </button>
 
-                  {isSelected ? (
+                  {isSelected && (
                     <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#1E4C40] text-[#F3E7CB]">
                       <Check className="h-4 w-4" />
                     </span>
-                  ) : locked ? (
-                    <button
-                      type="button"
-                      onClick={() => setSelectedProfileReciter(reciter)}
-                      className="inline-flex items-center gap-1 rounded-full bg-[#C89B4E]/15 px-2 py-0.5 text-[9px] font-extrabold text-[#9C7330]"
-                    >
-                      <Lock className="h-2.5 w-2.5" />
-                      Muhsinin
-                    </button>
-                  ) : null}
+                  )}
                 </div>
               </div>
             );
@@ -149,17 +129,11 @@ export function RecitersModal({
         <ReciterProfileModal
           reciter={selectedProfileReciter}
           activeReciterId={activeReciterId}
-          isProUser={isProUser}
           onClose={() => setSelectedProfileReciter(null)}
           onSelectReciter={(r) => {
-            onSelectReciter(r.id, r.isPro);
+            onSelectReciter(r.id);
             setSelectedProfileReciter(null);
             onClose();
-          }}
-          onUnlockRequest={() => {
-            setSelectedProfileReciter(null);
-            onClose();
-            onUnlockRequest?.();
           }}
         />
       )}

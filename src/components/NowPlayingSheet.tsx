@@ -248,11 +248,6 @@ export function NowPlayingSheet({
             </div>
 
             <div className="flex shrink-0 items-center gap-1.5">
-              {!isPro && (
-                <span className="rounded-full border border-[#C89B4E]/30 bg-[#C89B4E]/15 px-1.5 py-0.5 text-[8px] font-extrabold uppercase tracking-[0.12em] text-[#9C7330]">
-                  Streaming
-                </span>
-              )}
               <button
                 type="button"
                 onPointerDown={(event) => event.stopPropagation()}
@@ -539,54 +534,33 @@ export function NowPlayingSheet({
                 {volumePercent}%
               </button>
 
-              {isPro ? (
-                <button
-                  type="button"
-                  onClick={() => void downloadActiveJuzForOffline()}
-                  disabled={state.isDownloadingJuz}
-                  className={`flex flex-col items-center gap-0.5 rounded-xl py-1 text-[8.5px] font-bold transition disabled:opacity-60 ${
-                    isJuzComplete
-                      ? 'text-[#2F6B5B]'
-                      : 'text-[#6B7A72] hover:bg-[#1E4C40]/5'
-                  }`}
-                >
-                  {state.isDownloadingJuz ? (
-                    <>
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                      {state.downloadProgress}%
-                    </>
-                  ) : isJuzComplete ? (
-                    <>
-                      <CheckCircle2 className="h-3.5 w-3.5" />
-                      Lengkap
-                    </>
-                  ) : (
-                    <>
-                      <Download className="h-3.5 w-3.5" />
-                      Unduh
-                    </>
-                  )}
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    onClose();
-                    onOpenInfaq();
-                  }}
-                  title="Unduh audio offline — khusus Muhsinin"
-                  aria-label="Unduh audio offline, khusus Muhsinin"
-                  className="flex flex-col items-center gap-0.5 rounded-xl py-1 text-[8.5px] font-bold text-[#6B7A72] transition hover:bg-[#C89B4E]/12 hover:text-[#9C7330] active:scale-95"
-                >
-                  <span className="relative">
+              <button
+                type="button"
+                onClick={() => void downloadActiveJuzForOffline()}
+                disabled={state.isDownloadingJuz}
+                className={`flex flex-col items-center gap-0.5 rounded-xl py-1 text-[8.5px] font-bold transition disabled:opacity-60 ${
+                  isJuzComplete
+                    ? 'text-[#2F6B5B]'
+                    : 'text-[#6B7A72] hover:bg-[#1E4C40]/5'
+                }`}
+              >
+                {state.isDownloadingJuz ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    {state.downloadProgress}%
+                  </>
+                ) : isJuzComplete ? (
+                  <>
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                    Lengkap
+                  </>
+                ) : (
+                  <>
                     <Download className="h-3.5 w-3.5" />
-                    <span className="absolute -right-1 -top-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-[#C89B4E] text-[#FFFCF5] shadow-sm">
-                      <Lock className="h-1.5 w-1.5" />
-                    </span>
-                  </span>
-                  Unduh
-                </button>
-              )}
+                    Unduh
+                  </>
+                )}
+              </button>
 
               <button
                 type="button"
@@ -639,7 +613,6 @@ export function NowPlayingSheet({
               <div className="space-y-1.5">
                 {RECITERS.map((item) => {
                   const isSelected = item.id === state.reciterId;
-                  const isLocked = item.isPro && !isPro;
                   return (
                     <div
                       key={item.id}
@@ -652,11 +625,6 @@ export function NowPlayingSheet({
                       <button
                         type="button"
                         onClick={() => {
-                          if (isLocked) {
-                            setSelectedProfileReciter(item);
-                            setPanel(null);
-                            return;
-                          }
                           setReciter(item.id);
                           setPanel(null);
                         }}
@@ -703,22 +671,9 @@ export function NowPlayingSheet({
                           <Info className="h-3.5 w-3.5" />
                         </button>
 
-                        {isLocked ? (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedProfileReciter(item);
-                              setPanel(null);
-                            }}
-                            className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#C89B4E]/25 px-2 py-0.5 text-[9px] font-extrabold text-[#9C7330]"
-                          >
-                            <Lock className="h-2.5 w-2.5" />
-                            Muhsinin
-                          </button>
-                        ) : isSelected ? (
+                        {isSelected && (
                           <CheckCircle2 className="h-4 w-4 shrink-0 text-[#EAD8AF]" />
-                        ) : null}
+                        )}
                       </div>
                     </div>
                   );

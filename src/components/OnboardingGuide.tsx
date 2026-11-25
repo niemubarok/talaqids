@@ -73,7 +73,7 @@ const GUIDE_STEPS: GuideStep[] = [
     badge: 'Langkah 5/5 · Cloud & Profil',
     title: 'Sinkronisasi Google Drive & Profil',
     description:
-      'Sinkronkan data anak ke HP kedua orang tua via Google Drive pribadi tanpa server. Dukung kelangsungan aplikasi lewat Infaq sukarela (Tier Muhsinin) untuk membuka 30 Juz dan pilihan qari.',
+      'Sinkronkan data anak ke HP kedua orang tua via Google Drive pribadi tanpa server. Semua fitur terbuka gratis; Anda juga dapat mendukung kelangsungan aplikasi lewat Infaq sukarela.',
     tips: 'Data 100% aman dan privat karena tersimpan di folder khusus Google Drive pribadi Anda.',
     placement: 'bottom',
   },

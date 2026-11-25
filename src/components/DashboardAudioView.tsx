@@ -97,17 +97,9 @@ export function DashboardAudioView({
             <span className="h-1.5 w-1.5 rounded-full bg-[#EAD8AF]" />
             Bulan {cycle.currentMonth} · Hari {cycle.dayInCurrentCycle}/30
           </div>
-          {isPro ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-[#C89B4E]/25 px-2.5 py-1 text-[9px] font-extrabold uppercase tracking-[0.16em] text-[#F0DDB4] ring-1 ring-[#EAD8AF]/30">
-              <Crown className="h-2.5 w-2.5 text-[#EAD8AF]" />
-              Muhsinin
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.14em] text-white/75 ring-1 ring-white/15">
-              <Shield className="h-2.5 w-2.5 text-[#EAD8AF]" />
-              Free Tier
-            </span>
-          )}
+          <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.14em] text-[#F0DDB4] ring-1 ring-white/15">
+            Bebas Iklan
+          </span>
         </div>
 
         <div className="relative mt-4 flex items-end justify-between gap-4">
@@ -392,9 +384,7 @@ export function DashboardAudioView({
 
         <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-[#1E4C40]/8 pt-2.5">
           <span className="min-w-0 text-[10px] font-medium text-[#6B7A72]">
-            {isPro
-              ? `Offline tersimpan: ${state.offlineCachedCount}/${state.tracks.length} ayat`
-              : 'Mode pemutaran: Streaming Online'}
+            {`Offline tersimpan: ${state.offlineCachedCount}/${state.tracks.length} ayat`}
           </span>
           <button
             type="button"

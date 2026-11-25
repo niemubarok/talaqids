@@ -8,7 +8,8 @@ import { activateMuhsininTier } from '@/lib/db';
 interface InfaqModalProps {
   isOpen: boolean;
   onClose: () => void;
-  isProUser: boolean;
+  hasDonated?: boolean;
+  isProUser?: boolean;
   activeChildName: string;
 }
 
@@ -102,9 +103,11 @@ const INFAQ_OPTIONS = [
 export function InfaqModal({
   isOpen,
   onClose,
+  hasDonated,
   isProUser,
   activeChildName,
 }: InfaqModalProps) {
+  const alreadyDonated = Boolean(hasDonated || isProUser);
   const isQrisEnabled =
     process.env.NEXT_PUBLIC_ENABLE_QRIS !== 'false' &&
     process.env.NEXT_PUBLIC_ENABLE_QRIS !== '0';
@@ -169,10 +172,10 @@ export function InfaqModal({
             </span>
             <div>
               <h2 id="infaq-modal-title" className="text-[15px] font-extrabold text-[#15231E]">
-                Infaq &amp; Tier Muhsinin
+                Infaq &amp; Dukungan Dakwah
               </h2>
               <p className="text-[10px] text-[#6B7A72]">
-                Dukung keberlanjutan dakwah &amp; buka fitur Pro
+                Bantu operasional server &amp; keberlanjutan talaQids
               </p>
             </div>
           </div>
@@ -190,7 +193,7 @@ export function InfaqModal({
           {/* Hero Banner */}
           <div
             className={`relative overflow-hidden rounded-[24px] p-4 text-white shadow-md ${
-              isProUser
+              alreadyDonated
                 ? 'gold-gradient border border-[#C89B4E]/50 text-[#12211C]'
                 : 'hero-surface'
             }`}
@@ -198,31 +201,31 @@ export function InfaqModal({
             <div className="flex items-center justify-between">
               <span
                 className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider ${
-                  isProUser ? 'bg-[#1E4C40] text-[#F3E7CB]' : 'bg-[#EAD8AF] text-[#15231E]'
+                  alreadyDonated ? 'bg-[#1E4C40] text-[#F3E7CB]' : 'bg-[#EAD8AF] text-[#15231E]'
                 }`}
               >
-                {isProUser ? (
+                {alreadyDonated ? (
                   <Crown className="h-3 w-3 text-[#EAD8AF]" />
                 ) : (
                   <Shield className="h-3 w-3 text-[#1E4C40]" />
                 )}
-                {isProUser ? 'Tier Muhsinin Aktif' : 'Free Tier'}
+                {alreadyDonated ? 'Jazakumullahu Khairan' : '100% Gratis • Bebas Iklan'}
               </span>
             </div>
             <h3
               className={`mt-2 text-[18px] font-extrabold leading-tight ${
-                isProUser ? 'text-[#12211C]' : 'text-white'
+                alreadyDonated ? 'text-[#12211C]' : 'text-white'
               }`}
             >
               Tumbuhkan cinta Al-Qur&apos;an sejak dini
             </h3>
             <p
               className={`mt-1 text-[11px] leading-relaxed ${
-                isProUser ? 'text-[#1F352D]' : 'text-[#F3E7CB]/90'
+                alreadyDonated ? 'text-[#1F352D]' : 'text-[#F3E7CB]/90'
               }`}
             >
-              Seluruh 30 Juz terbuka bebas iklan. Infaq sukarela Anda mendukung operasional server dan
-              membuka sinkronisasi cloud Google Drive, pilihan edisi mushaf &amp; seluruh qari pilihan.
+              Seluruh 30 Juz, semua qari, edisi mushaf, dan sinkronisasi Google Drive terbuka gratis
+              tanpa iklan. Infaq sukarela Anda membantu biaya server &amp; pengembangan aplikasi.
             </p>
           </div>
 
@@ -236,7 +239,7 @@ export function InfaqModal({
                 آجَرَكَ اللَّهُ فِيمَا أَعْطَيْتَ، وَبَارَكَ فِيمَا أَبْقَيْتَ
               </p>
               <p className="mt-1 text-[10.5px] text-[#6B7A72]">
-                Seluruh fitur <strong>Tier Muhsinin</strong> kini aktif. Semoga menjadi amal jariyah.
+                Terima kasih atas dukungan infaq Anda. Semoga menjadi amal jariyah yang terus mengalir.
               </p>
             </div>
           )}
@@ -450,7 +453,7 @@ export function InfaqModal({
               </a>
             )}
 
-            {!isProUser && (
+            {!alreadyDonated && (
               <button
                 type="button"
                 disabled={isActivating}
@@ -458,7 +461,7 @@ export function InfaqModal({
                 className="flex min-h-[42px] w-full items-center justify-center gap-2 rounded-full border border-[#1E4C40]/20 bg-white text-[11px] font-extrabold text-[#1E4C40] transition hover:bg-[#1E4C40]/5 active:scale-98"
               >
                 <Sparkles className="h-3.5 w-3.5 text-[#C89B4E]" />
-                Saya Sudah Infaq (Aktifkan Sekarang)
+                Saya Sudah Berinfaq
               </button>
             )}
           </div>

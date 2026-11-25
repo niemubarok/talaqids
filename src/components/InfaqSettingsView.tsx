@@ -98,8 +98,7 @@ export function InfaqSettingsView({
     setPrayerBanner(true);
   };
 
-  const handleSelectReciter = async (reciterId: string, isProReciter: boolean) => {
-    if (isProReciter && !settings.isProUser) return;
+  const handleSelectReciter = async (reciterId: string) => {
     await db.children.update(activeChild.id, {
       preferredReciterId: reciterId,
       updatedAt: new Date().toISOString(),
@@ -160,7 +159,7 @@ export function InfaqSettingsView({
           ) : (
             <Shield className="h-3 w-3 text-[#1E4C40]" />
           )}
-          {settings.isProUser ? 'Tier Muhsinin Aktif' : 'Free Tier'}
+          {settings.isProUser ? 'Jazakumullahu Khairan' : '100% Gratis • Bebas Iklan'}
         </div>
 
         <h2
@@ -175,15 +174,12 @@ export function InfaqSettingsView({
             settings.isProUser ? 'text-[#1F352D]' : 'text-[#F3E7CB]/95'
           }`}
         >
-          Seluruh 30 Juz terbuka gratis, tanpa iklan, tanpa paywall ayat. Infaq sukarela Anda
-          menjaga server tetap hidup dan membuka fitur ekstra Tier Muhsinin.
+          Seluruh 30 Juz, semua qari, pilihan mushaf, dan sinkronisasi cloud terbuka gratis tanpa
+          paywall. Infaq sukarela Anda menjaga server tetap hidup dan bebas iklan.
         </p>
 
         <div className="relative mt-4 flex flex-wrap gap-1.5">
-          {(settings.isProUser
-            ? ['30 Juz terbuka', 'Tanpa iklan', 'Audio offline aktif', 'Sinkronisasi Cloud', 'Pilihan Mushaf']
-            : ['30 Juz terbuka', 'Tanpa iklan', 'Streaming online', 'Mushaf Madinah']
-          ).map((item) => (
+          {['30 Juz terbuka', 'Tanpa iklan', 'Audio offline', 'Sinkronisasi Cloud', 'Semua Qari & Mushaf'].map((item) => (
             <span
               key={item}
               className={`rounded-full px-2.5 py-1 text-[9.5px] font-extrabold ${
@@ -209,7 +205,7 @@ export function InfaqSettingsView({
           </p>
           <p className="mt-1.5 text-[11px] leading-relaxed text-[#6B7A72]">
             &ldquo;Semoga Allah memberi pahala atas apa yang engkau berikan dan memberkahi harta
-            yang engkau sisakan.&rdquo; Seluruh fitur <strong>Muhsinin</strong> kini aktif.
+            yang engkau sisakan.&rdquo; Terima kasih atas dukungan infaq Anda.
           </p>
         </div>
       )}
@@ -225,7 +221,7 @@ export function InfaqSettingsView({
               Buah hati
             </h3>
           </div>
-          {(settings.isProUser || childrenList.length < 1) && childrenList.length < 5 && (
+          {childrenList.length < 5 && (
             <button
               type="button"
               onClick={onAddChildClick}
@@ -238,17 +234,8 @@ export function InfaqSettingsView({
         </div>
 
         <p className="mt-1 flex items-center gap-1.5 text-[10px] text-[#8A968F]">
-          {settings.isProUser ? (
-            <>
-              <Crown className="h-3 w-3 text-[#C89B4E]" />
-              <span>Tier Muhsinin · {childrenList.length}/5 profil</span>
-            </>
-          ) : (
-            <>
-              <Shield className="h-3 w-3 text-[#8A968F]" />
-              <span>Free tier · maksimal 1 profil anak</span>
-            </>
-          )}
+          <ShieldCheck className="h-3 w-3 text-[#2F6B5B]" />
+          <span>{childrenList.length}/5 profil anak</span>
         </p>
 
         <div className="mt-3 space-y-1.5">
@@ -328,27 +315,20 @@ export function InfaqSettingsView({
         <div className="mt-3 space-y-2">
           {RECITERS.map((reciter) => {
             const isSelected = activeChild.preferredReciterId === reciter.id;
-            const locked = reciter.isPro && !settings.isProUser;
             return (
               <div
                 key={reciter.id}
                 className={`group flex items-center justify-between gap-3 rounded-2xl border p-2.5 transition ${
                   isSelected
                     ? 'border-[#C89B4E]/70 bg-[#C89B4E]/10 ring-1 ring-[#C89B4E]/30'
-                    : locked
-                      ? 'border-[#1E4C40]/8 bg-[#FBF6EC]/60 opacity-70'
-                      : 'border-[#1E4C40]/8 bg-[#FFFCF5] hover:bg-[#FBF6EC]'
+                    : 'border-[#1E4C40]/8 bg-[#FFFCF5] hover:bg-[#FBF6EC]'
                 }`}
               >
                 {/* Clickable selector part */}
                 <button
                   type="button"
                   onClick={() => {
-                    if (locked) {
-                      setSelectedProfileReciter(reciter);
-                      return;
-                    }
-                    void handleSelectReciter(reciter.id, reciter.isPro);
+                    void handleSelectReciter(reciter.id);
                   }}
                   className="flex min-w-0 flex-1 items-center gap-3 text-left"
                 >
@@ -389,19 +369,11 @@ export function InfaqSettingsView({
                     <span>Profil</span>
                   </button>
 
-                  {isSelected ? (
+                  {isSelected && (
                     <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#1E4C40] text-[#F3E7CB]">
                       <Check className="h-4 w-4" />
                     </span>
-                  ) : locked ? (
-                    <button
-                      type="button"
-                      onClick={() => setSelectedProfileReciter(reciter)}
-                      className="shrink-0 rounded-full bg-[#C89B4E]/15 px-2 py-0.5 text-[9px] font-extrabold text-[#9C7330]"
-                    >
-                      Muhsinin
-                    </button>
-                  ) : null}
+                  )}
                 </div>
               </div>
             );
@@ -488,7 +460,7 @@ export function InfaqSettingsView({
             className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-2xl bg-[#1E4C40] text-[12px] font-extrabold text-[#F3E7CB] shadow-[0_20px_40px_-24px_rgba(16,46,39,0.9)] transition active:scale-[0.99]"
           >
             <HeartHandshake className="h-4 w-4" />
-            Saya sudah berinfaq, buka Muhsinin
+            Saya sudah berinfaq
           </button>
 
           <a
@@ -511,12 +483,6 @@ export function InfaqSettingsView({
               <h3 className="mt-0.5 text-[14px] font-extrabold text-[#15231E]">
                 Sinkronisasi HP Ayah &amp; Bunda
               </h3>
-              {!settings.isProUser && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-[#C89B4E]/15 px-2 py-0.5 text-[9px] font-extrabold text-[#9C7330]">
-                  <Lock className="h-2.5 w-2.5" />
-                  Muhsinin
-                </span>
-              )}
             </div>
             <p className="mt-0.5 text-[10px] leading-relaxed text-[#6B7A72]">
               Data disimpan di folder tersembunyi Google Drive pribadi Anda (<code className="font-mono text-[9.5px] text-[#1E4C40]">talaqids_data.json</code>). Privasi terjaga 100%.
@@ -525,73 +491,48 @@ export function InfaqSettingsView({
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-[#FFFCF5] shadow-xs ring-1 ring-[#1E4C40]/10">
             <div className="relative flex items-center justify-center">
               <GoogleDriveIcon className="h-5 w-5 shrink-0" />
-              {!settings.isProUser && (
-                <span className="absolute -bottom-1 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#C89B4E] text-[#15231E] shadow-xs ring-1 ring-[#FFFCF5]">
-                  <Lock className="h-2 w-2 stroke-[2.8]" />
-                </span>
-              )}
             </div>
           </span>
         </div>
 
-        <div
-          className={`rounded-2xl p-3 ring-1 ${
-            settings.isProUser
-              ? 'bg-[#F6F0E4]/80 ring-[#1E4C40]/8'
-              : 'bg-[#FBF6EC]/60 opacity-75 ring-[#C89B4E]/20'
-          }`}
-        >
+        <div className="rounded-2xl bg-[#F6F0E4]/80 p-3 ring-1 ring-[#1E4C40]/8">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="min-w-0">
               <p className="text-[10px] font-extrabold text-[#15231E]">
-                {!settings.isProUser
-                  ? 'Fitur Terkunci (Khusus Tier Muhsinin)'
-                  : settings.googleDriveEmail
-                    ? `Terhubung: ${settings.googleDriveEmail}`
-                    : settings.googleDriveLastSyncedAt
-                      ? 'Terhubung ke Google Drive'
-                      : 'Belum terhubung ke Google Drive'}
+                {settings.googleDriveEmail
+                  ? `Terhubung: ${settings.googleDriveEmail}`
+                  : settings.googleDriveLastSyncedAt
+                    ? 'Terhubung ke Google Drive'
+                    : 'Belum terhubung ke Google Drive'}
               </p>
               <p className="mt-0.5 text-[9.5px] font-semibold text-[#6B7A72]">
-                {!settings.isProUser
-                  ? 'Aktifkan Tier Muhsinin di atas untuk sinkronisasi otomatis antar perangkat'
-                  : `Terakhir sinkron: ${formatRelativeSyncTime(settings.googleDriveLastSyncedAt)}`}
+                {`Terakhir sinkron: ${formatRelativeSyncTime(settings.googleDriveLastSyncedAt)}`}
               </p>
             </div>
 
             <div className="flex items-center gap-1.5">
               <button
                 type="button"
-                disabled={!settings.isProUser || isSyncingCloud}
+                disabled={isSyncingCloud}
                 onClick={() => void onManualSyncCloud?.()}
-                className={`flex items-center gap-2 rounded-full px-3 py-1.5 text-[10px] font-extrabold shadow-sm transition ${
-                  settings.isProUser
-                    ? 'bg-[#1E4C40] text-[#F3E7CB] hover:bg-[#163a31] active:scale-95 disabled:opacity-60'
-                    : 'cursor-not-allowed bg-[#C89B4E]/20 text-[#9C7330]'
-                }`}
+                className="flex items-center gap-2 rounded-full bg-[#1E4C40] px-3 py-1.5 text-[10px] font-extrabold text-[#F3E7CB] shadow-sm transition hover:bg-[#163a31] active:scale-95 disabled:opacity-60"
               >
                 <div className="relative flex shrink-0 items-center justify-center">
                   <GoogleDriveIcon className="h-3.5 w-3.5 shrink-0" />
-                  {!settings.isProUser ? (
-                    <span className="absolute -bottom-1 -right-1.5 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-[#C89B4E] text-[#15231E] ring-1 ring-white">
-                      <Lock className="h-1.5 w-1.5 stroke-[2.8]" />
-                    </span>
-                  ) : isSyncingCloud ? (
+                  {isSyncingCloud && (
                     <span className="absolute -bottom-1 -right-1.5 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-[#1E4C40] text-white">
                       <Loader2 className="h-1.5 w-1.5 animate-spin" />
                     </span>
-                  ) : null}
+                  )}
                 </div>
-                {!settings.isProUser
-                  ? 'Terkunci'
-                  : isSyncingCloud
-                    ? 'Menyinkronkan...'
-                    : settings.googleDriveLastSyncedAt
-                      ? 'Sinkronkan'
-                      : 'Hubungkan Google Drive'}
+                {isSyncingCloud
+                  ? 'Menyinkronkan...'
+                  : settings.googleDriveLastSyncedAt
+                    ? 'Sinkronkan'
+                    : 'Hubungkan Google Drive'}
               </button>
 
-              {settings.isProUser && (settings.googleDriveEmail || settings.googleDriveLastSyncedAt) && (
+              {(settings.googleDriveEmail || settings.googleDriveLastSyncedAt) && (
                 <button
                   type="button"
                   onClick={() => void handleDisconnectDrive()}
@@ -676,13 +617,8 @@ export function InfaqSettingsView({
       <ReciterProfileModal
         reciter={selectedProfileReciter}
         activeReciterId={activeChild.preferredReciterId}
-        isProUser={settings.isProUser}
         onClose={() => setSelectedProfileReciter(null)}
-        onSelectReciter={(r) => void handleSelectReciter(r.id, r.isPro)}
-        onUnlockRequest={() => {
-          const el = document.getElementById('infaq-section');
-          el?.scrollIntoView({ behavior: 'smooth' });
-        }}
+        onSelectReciter={(r) => void handleSelectReciter(r.id)}
       />
 
       {/* ── Edit Child Modal ─────────────────────────────────────────── */}

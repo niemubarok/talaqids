@@ -149,11 +149,7 @@ export default function HomePage() {
     notifyLocalDataMutated();
   };
 
-  const handleSelectReciter = async (reciterId: string, isProReciter: boolean) => {
-    if (isProReciter && !settings.isProUser) {
-      setShowInfaqModal(true);
-      return;
-    }
+  const handleSelectReciter = async (reciterId: string) => {
     if (!activeChild) return;
     await db.children.update(activeChild.id, {
       preferredReciterId: reciterId,
@@ -201,12 +197,6 @@ export default function HomePage() {
   };
 
   const triggerCloudSync = useCallback(async (interactive: boolean) => {
-    if (!settings.isProUser) {
-      if (interactive) {
-        setShowInfaqModal(true);
-      }
-      return;
-    }
     if (syncingRef.current) return;
     syncingRef.current = true;
     setIsSyncingCloud(true);
@@ -226,7 +216,7 @@ export default function HomePage() {
       syncingRef.current = false;
       setIsSyncingCloud(false);
     }
-  }, [settings.isProUser]);
+  }, []);
 
   // Refresh "Terakhir sinkron: X menit lalu" label every 30s
   useEffect(() => {
@@ -242,7 +232,7 @@ export default function HomePage() {
   // 3. Debounced push after local IndexedDB mutations
   useEffect(() => {
     const canSilentSync = () =>
-      Boolean(settings.isProUser && getConfiguredGoogleClientId() && getStoredAccessToken());
+      Boolean(getConfiguredGoogleClientId() && getStoredAccessToken());
 
     if (canSilentSync()) {
       void triggerCloudSync(false);
@@ -281,7 +271,7 @@ export default function HomePage() {
       window.clearInterval(pollInterval);
       if (debounceTimer) window.clearTimeout(debounceTimer);
     };
-  }, [settings.isProUser, triggerCloudSync]);
+  }, [triggerCloudSync]);
 
   const isLoadingInitial = childrenList === undefined;
 
@@ -342,29 +332,19 @@ export default function HomePage() {
               <button
                 type="button"
                 onClick={() => {
-                  if (!settings.isProUser) {
-                    setShowInfaqModal(true);
-                  } else {
-                    void triggerCloudSync(true);
-                  }
+                  void triggerCloudSync(true);
                 }}
                 disabled={isSyncingCloud}
                 title={
-                  !settings.isProUser
-                    ? 'Sinkronisasi Google Drive (Fitur Muhsinin)'
-                    : settings.googleDriveLastSyncedAt
-                      ? `Terakhir sinkron: ${formatRelativeSyncTime(settings.googleDriveLastSyncedAt)}`
-                      : 'Sinkronkan ke Google Drive'
+                  settings.googleDriveLastSyncedAt
+                    ? `Terakhir sinkron: ${formatRelativeSyncTime(settings.googleDriveLastSyncedAt)}`
+                    : 'Sinkronkan ke Google Drive'
                 }
                 aria-label="Sinkronisasi Google Drive"
                 className="relative flex h-9 w-9 shrink-0 items-center justify-center text-[#1E4C40] transition hover:text-[#C89B4E] active:scale-90 disabled:opacity-60"
               >
                 <GoogleDriveIcon className="h-[21px] w-[21px] shrink-0" />
-                {!settings.isProUser ? (
-                  <span className="absolute bottom-0 right-0 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#C89B4E] text-[#15231E] shadow-xs ring-1.5 ring-[#F6F0E4]">
-                    <Lock className="h-2 w-2 stroke-[2.8]" />
-                  </span>
-                ) : isSyncingCloud ? (
+                {isSyncingCloud ? (
                   <span className="absolute bottom-0 right-0 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#1E4C40] text-[#F3E7CB] shadow-xs ring-1.5 ring-[#F6F0E4]">
                     <RefreshCw className="h-2 w-2 animate-spin stroke-[2.8]" />
                   </span>
@@ -377,19 +357,19 @@ export default function HomePage() {
                 type="button"
                 onClick={() => setShowInfaqModal(true)}
                 title={
-                  settings.isProUser
-                    ? 'Status Muhsinin Aktif • Barakallahu fiikum'
+                  settings.isProUser || settings.infaqActivatedAt
+                    ? 'Jazakumullahu khairan • Infaq & Dukungan Dakwah'
                     : 'Infaq & Dukung talaQids'
                 }
-                aria-label="Infaq & Muhsinin"
+                aria-label="Infaq & Dukung talaQids"
                 className={`relative flex h-9 w-9 shrink-0 items-center justify-center transition active:scale-90 ${
-                  settings.isProUser
+                  settings.isProUser || settings.infaqActivatedAt
                     ? 'text-[#C89B4E] hover:text-[#8A6220]'
                     : 'text-[#1E4C40] hover:text-[#C89B4E]'
                 }`}
               >
                 <HeartHandshake className="h-[22px] w-[22px] shrink-0 stroke-[2.2]" />
-                {settings.isProUser && (
+                {(settings.isProUser || settings.infaqActivatedAt) && (
                   <span className="absolute bottom-0.5 right-0.5 h-2 w-2 rounded-full bg-[#C89B4E] ring-1.5 ring-[#F6F0E4]" />
                 )}
               </button>
@@ -564,31 +544,28 @@ export default function HomePage() {
             isOpen={showRecitersModal}
             onClose={() => setShowRecitersModal(false)}
             activeReciterId={activeChild.preferredReciterId || 'husary'}
-            isProUser={settings.isProUser}
-            onSelectReciter={(id, isPro) => void handleSelectReciter(id, isPro)}
-            onUnlockRequest={() => setShowInfaqModal(true)}
+            onSelectReciter={(id) => void handleSelectReciter(id)}
           />
 
           <InfaqModal
             isOpen={showInfaqModal}
             onClose={() => setShowInfaqModal(false)}
-            isProUser={settings.isProUser}
+            hasDonated={Boolean(settings.isProUser || settings.infaqActivatedAt)}
             activeChildName={activeChild.name}
           />
 
           <GoogleDriveSyncModal
             isOpen={showDriveModal}
             onClose={() => setShowDriveModal(false)}
-            isProUser={settings.isProUser}
             isSyncing={isSyncingCloud}
             lastSyncedAt={settings.googleDriveLastSyncedAt}
+            driveEmail={settings.googleDriveEmail}
             error={cloudError}
             onManualSync={() => triggerCloudSync(true)}
             onDisconnect={async () => {
               await disconnectGoogleDrive();
               notifyLocalDataMutated();
             }}
-            onUnlockRequest={() => setShowInfaqModal(true)}
           />
 
           <OnboardingGuide

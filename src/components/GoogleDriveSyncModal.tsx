@@ -1,34 +1,30 @@
 'use client';
 
 import React from 'react';
-import { Loader2, Lock, LogOut, RefreshCw, ShieldCheck, Sparkles, X } from 'lucide-react';
+import { Loader2, LogOut, RefreshCw, ShieldCheck, X } from 'lucide-react';
 import { GoogleDriveIcon } from '@/components/GoogleDriveIcon';
 import { formatRelativeSyncTime } from '@/lib/google-drive-sync';
 
 interface GoogleDriveSyncModalProps {
   isOpen: boolean;
   onClose: () => void;
-  isProUser: boolean;
   isSyncing: boolean;
   lastSyncedAt?: string;
   driveEmail?: string;
   error?: string | null;
   onManualSync: () => Promise<void>;
   onDisconnect: () => Promise<void>;
-  onUnlockRequest?: () => void;
 }
 
 export function GoogleDriveSyncModal({
   isOpen,
   onClose,
-  isProUser,
   isSyncing,
   lastSyncedAt,
   driveEmail,
   error,
   onManualSync,
   onDisconnect,
-  onUnlockRequest,
 }: GoogleDriveSyncModalProps) {
   if (!isOpen) return null;
 
@@ -71,27 +67,16 @@ export function GoogleDriveSyncModal({
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-[12px] font-extrabold text-[#15231E]">
-                  {!isProUser
-                    ? 'Fitur Khusus Tier Muhsinin'
-                    : driveEmail
-                      ? `Terhubung: ${driveEmail}`
-                      : lastSyncedAt
-                        ? 'Terhubung ke Google Drive'
-                        : 'Belum Terhubung ke Google Drive'}
+                  {driveEmail
+                    ? `Terhubung: ${driveEmail}`
+                    : lastSyncedAt
+                      ? 'Terhubung ke Google Drive'
+                      : 'Belum Terhubung ke Google Drive'}
                 </p>
                 <p className="mt-1 text-[10.5px] text-[#6B7A72]">
-                  {!isProUser
-                    ? 'Dukung aplikasi lewat Infaq untuk membuka fitur sinkronisasi otomatis antar HP orang tua.'
-                    : `Terakhir sinkron: ${formatRelativeSyncTime(lastSyncedAt)}`}
+                  {`Terakhir sinkron: ${formatRelativeSyncTime(lastSyncedAt)}`}
                 </p>
               </div>
-
-              {!isProUser && (
-                <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#C89B4E]/15 px-2.5 py-1 text-[9px] font-extrabold text-[#9C7330]">
-                  <Lock className="h-2.5 w-2.5" />
-                  Muhsinin
-                </span>
-              )}
             </div>
 
             {error && (
@@ -111,51 +96,37 @@ export function GoogleDriveSyncModal({
 
           {/* Action Buttons */}
           <div className="space-y-2 pt-1">
-            {!isProUser ? (
+            <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => {
-                  onClose();
-                  onUnlockRequest?.();
-                }}
-                className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full bg-[#1E4C40] text-[11px] font-extrabold text-[#F3E7CB] shadow-md transition hover:bg-[#163B32] active:scale-98"
+                disabled={isSyncing}
+                onClick={() => void onManualSync()}
+                className="flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-full bg-[#1E4C40] text-[11px] font-extrabold text-[#F3E7CB] shadow-sm transition hover:bg-[#163B32] active:scale-98 disabled:opacity-60"
               >
-                <Sparkles className="h-4 w-4 text-[#C89B4E]" />
-                Buka Sinkronisasi via Infaq
+                {isSyncing ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin text-[#C89B4E]" />
+                    <span>Sedang Menyinkronkan...</span>
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4 text-[#C89B4E]" />
+                    <span>{lastSyncedAt ? 'Sinkronkan Sekarang' : 'Hubungkan Akun Drive'}</span>
+                  </>
+                )}
               </button>
-            ) : (
-              <div className="flex items-center gap-2">
+
+              {(driveEmail || lastSyncedAt) && (
                 <button
                   type="button"
-                  disabled={isSyncing}
-                  onClick={() => void onManualSync()}
-                  className="flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-full bg-[#1E4C40] text-[11px] font-extrabold text-[#F3E7CB] shadow-sm transition hover:bg-[#163B32] active:scale-98 disabled:opacity-60"
+                  onClick={() => void onDisconnect()}
+                  title="Putuskan akun Google Drive"
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#B4483D]/20 bg-[#B4483D]/10 text-[#A03A31] transition hover:bg-[#B4483D]/20 active:scale-95"
                 >
-                  {isSyncing ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin text-[#C89B4E]" />
-                      <span>Sedang Menyinkronkan...</span>
-                    </>
-                  ) : (
-                    <>
-                      <RefreshCw className="h-4 w-4 text-[#C89B4E]" />
-                      <span>{lastSyncedAt ? 'Sinkronkan Sekarang' : 'Hubungkan Akun Drive'}</span>
-                    </>
-                  )}
+                  <LogOut className="h-4 w-4" />
                 </button>
-
-                {(driveEmail || lastSyncedAt) && (
-                  <button
-                    type="button"
-                    onClick={() => void onDisconnect()}
-                    title="Putuskan akun Google Drive"
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#B4483D]/20 bg-[#B4483D]/10 text-[#A03A31] transition hover:bg-[#B4483D]/20 active:scale-95"
-                  >
-                    <LogOut className="h-4 w-4" />
-                  </button>
-                )}
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>

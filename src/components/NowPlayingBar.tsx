@@ -107,11 +107,6 @@ export function NowPlayingBar({ isPro = false, onExpand }: NowPlayingBarProps) {
             <p className="truncate text-[13px] font-extrabold leading-tight tracking-tight text-[#15231E]">
               {track ? `QS. ${track.surahName} · ${track.ayahNumber}` : 'Menyiapkan murottal...'}
             </p>
-            {!isPro && (
-              <span className="shrink-0 rounded-full bg-[#C89B4E]/15 px-1.5 py-0.5 text-[8px] font-extrabold uppercase tracking-wider text-[#9C7330]">
-                Streaming
-              </span>
-            )}
           </div>
           <p className="mt-0.5 truncate text-[10.5px] font-medium text-[#6B7A72]">
             {reciter.shortName} • Juz {state.activeJuz} • Hlm. {track?.mushafPage ?? 1}

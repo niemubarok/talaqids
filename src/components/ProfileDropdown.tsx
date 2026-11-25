@@ -204,7 +204,7 @@ export function ProfileDropdown({
           <ChevronRight className="h-3.5 w-3.5 text-[#8A968F]" />
         </button>
 
-        {/* 3. Infaq & Tier Muhsinin */}
+        {/* 3. Infaq & Dukungan Dakwah */}
         <button
           type="button"
           onClick={() => {
@@ -218,17 +218,17 @@ export function ProfileDropdown({
               <HeartHandshake className="h-3.5 w-3.5" />
             </span>
             <div>
-              <p className="text-[11.5px] font-extrabold text-[#15231E]">Infaq &amp; Muhsinin</p>
+              <p className="text-[11.5px] font-extrabold text-[#15231E]">Infaq &amp; Dukung Dakwah</p>
               <p className="flex items-center gap-1 text-[9px] text-[#8A6220]">
                 {isProUser ? (
                   <>
                     <Crown className="h-2.5 w-2.5 text-[#8A6220]" />
-                    <span>Tier Muhsinin Aktif</span>
+                    <span>Jazakumullahu Khairan</span>
                   </>
                 ) : (
                   <>
                     <Shield className="h-2.5 w-2.5 text-[#8A6220]" />
-                    <span>Free Tier · Buka 30 Juz</span>
+                    <span>100% Gratis · Bebas Iklan</span>
                   </>
                 )}
               </p>
